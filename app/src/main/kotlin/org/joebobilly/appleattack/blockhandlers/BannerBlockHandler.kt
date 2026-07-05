@@ -7,7 +7,7 @@ import net.minestom.server.tag.Tag
 import org.joebobilly.appleattack.utils.TagUtils
 
 object BannerBlockHandler : BlockHandler {
-    val customName: Tag<Component?> = Tag.Component("CustomName")
+    val customName: Tag<Component> = Tag.Component("CustomName")
     val patterns = TagUtils.bannerPatternsTag("patterns")
 
     override fun getKey(): Key {

@@ -7,7 +7,7 @@ import org.joebobilly.appleattack.utils.SignText
 
 sealed class SignBlockHandler : BlockHandler {
     companion object {
-        val isWaxed: Tag<Boolean?> = Tag.Boolean("is_waxed")
+        val isWaxed: Tag<Boolean> = Tag.Boolean("is_waxed")
         val frontText = SignText.tag("front_text")
         val backText = SignText.tag("back_text")
     }

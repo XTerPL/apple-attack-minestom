@@ -8,7 +8,7 @@ import org.joebobilly.appleattack.utils.SignText
 import org.joebobilly.appleattack.utils.TagUtils
 
 object SkullBlockHandler : BlockHandler {
-    val customName: Tag<Component?> = Tag.Component("custom_name")
+    val customName: Tag<Component> = Tag.Component("custom_name")
     val noteBlockSound = TagUtils.keyTag("note_block_sound")
     val profile = TagUtils.resolvableProfileTag("profile")
 

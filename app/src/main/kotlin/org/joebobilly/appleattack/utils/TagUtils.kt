@@ -16,7 +16,7 @@ import net.minestom.server.tag.Tag
 import java.util.Locale
 
 object TagUtils {
-    inline fun <reified R : Enum<R>> enumTag(key: String): Tag<R?> {
+    inline fun <reified R : Enum<R>> enumTag(key: String): Tag<R> {
         return Tag.String(key).map({
             string ->
             try {
@@ -30,7 +30,7 @@ object TagUtils {
         })
     }
 
-    fun <R> wrapCodecTag(key: String, codec: Codec<R>, transcoderSupplier: () -> Transcoder<BinaryTag>): Tag<R?> {
+    fun <R> wrapCodecTag(key: String, codec: Codec<R>, transcoderSupplier: () -> Transcoder<BinaryTag>): Tag<R> {
         return Tag.NBT(key).map({
                 nbt ->
                 val result = codec.decode(transcoderSupplier(), nbt)
@@ -45,27 +45,27 @@ object TagUtils {
         )
     }
 
-    fun <R> wrapCodecTag(key: String, codec: Codec<R>): Tag<R?> {
+    fun <R> wrapCodecTag(key: String, codec: Codec<R>): Tag<R> {
         return wrapCodecTag(key, codec) {
             Transcoder.NBT
         }
     }
 
-    fun componentListTag(key: String): Tag<List<Component>?> {
+    fun componentListTag(key: String): Tag<List<Component>> {
         return wrapCodecTag(key, Codec.COMPONENT.list())
     }
 
-    fun resolvableProfileTag(key: String): Tag<ResolvableProfile?> {
+    fun resolvableProfileTag(key: String): Tag<ResolvableProfile> {
         return wrapCodecTag(key, ResolvableProfile.CODEC)
     }
 
-    fun bannerPatternsTag(key: String): Tag<BannerPatterns?> {
+    fun bannerPatternsTag(key: String): Tag<BannerPatterns> {
         return wrapCodecTag(key, BannerPatterns.CODEC) {
             RegistryTranscoder(Transcoder.NBT, MinecraftServer.process())
         }
     }
 
-    fun keyTag(key: String): Tag<Key?> {
+    fun keyTag(key: String): Tag<Key> {
         return Tag.String(key).map(
             {
                 string -> try {
