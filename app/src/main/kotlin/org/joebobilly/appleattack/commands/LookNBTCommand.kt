@@ -9,7 +9,7 @@ import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.CommandContext
 import net.minestom.server.entity.Player
 
-class LookNBTCommand : Command("looknbt") {
+object LookNBTCommand : Command("looknbt") {
     init {
         defaultExecutor = { sender: CommandSender?, _: CommandContext ->
             sender?.sendMessage(Component.text("Syntax: /looknbt", NamedTextColor.RED))

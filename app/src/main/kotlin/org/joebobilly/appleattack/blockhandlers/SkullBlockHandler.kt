@@ -7,20 +7,16 @@ import net.minestom.server.tag.Tag
 import org.joebobilly.appleattack.utils.SignText
 import org.joebobilly.appleattack.utils.TagUtils
 
-class SkullBlockHandler : BlockHandler {
-    companion object {
-        val staticKey: Key = Key.key("minecraft", "skull")
-
-        val customName: Tag<Component?> = Tag.Component("custom_name")
-        val noteBlockSound = TagUtils.keyTag("note_block_sound")
-        val profile = TagUtils.resolvableProfileTag("profile")
-    }
+object SkullBlockHandler : BlockHandler {
+    val customName: Tag<Component?> = Tag.Component("custom_name")
+    val noteBlockSound = TagUtils.keyTag("note_block_sound")
+    val profile = TagUtils.resolvableProfileTag("profile")
 
     override fun getKey(): Key {
-        return staticKey
+        return Key.key("minecraft", "skull")
     }
 
-    override fun getBlockEntityTags(): Collection<Tag<*>?> {
+    override fun getBlockEntityTags(): Collection<Tag<*>> {
         return listOf(customName, noteBlockSound, profile)
     }
 }

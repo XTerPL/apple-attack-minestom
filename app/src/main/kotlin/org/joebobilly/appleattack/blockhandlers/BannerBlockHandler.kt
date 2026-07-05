@@ -6,19 +6,15 @@ import net.minestom.server.instance.block.BlockHandler
 import net.minestom.server.tag.Tag
 import org.joebobilly.appleattack.utils.TagUtils
 
-class BannerBlockHandler : BlockHandler {
-    companion object {
-        val staticKey: Key = Key.key("minecraft", "banner")
-
-        val customName: Tag<Component?> = Tag.Component("CustomName")
-        val patterns = TagUtils.bannerPatternsTag("patterns")
-    }
+object BannerBlockHandler : BlockHandler {
+    val customName: Tag<Component?> = Tag.Component("CustomName")
+    val patterns = TagUtils.bannerPatternsTag("patterns")
 
     override fun getKey(): Key {
-        return staticKey
+        return Key.key("minecraft", "banner")
     }
 
-    override fun getBlockEntityTags(): Collection<Tag<*>?> {
+    override fun getBlockEntityTags(): Collection<Tag<*>> {
         return listOf(customName, patterns)
     }
 }

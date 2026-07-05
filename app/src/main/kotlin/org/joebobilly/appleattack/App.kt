@@ -8,8 +8,6 @@ import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.instance.anvil.AnvilLoader
 import net.minestom.server.instance.InstanceContainer
-import net.minestom.server.instance.block.banner.BannerPattern
-import net.minestom.server.registry.DynamicRegistry
 import org.joebobilly.appleattack.blockhandlers.BannerBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SignBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SkullBlockHandler
@@ -21,17 +19,17 @@ fun main() {
     val minecraftServer = MinecraftServer.init(Auth.Online())
 
     val blockManager = MinecraftServer.getBlockManager()
-    blockManager.registerHandler(SignBlockHandler.Regular.staticKey) {
-        SignBlockHandler.Regular()
+    blockManager.registerHandler(SignBlockHandler.Regular.key) {
+        SignBlockHandler.Regular
     }
-    blockManager.registerHandler(SignBlockHandler.Hanging.staticKey) {
-        SignBlockHandler.Hanging()
+    blockManager.registerHandler(SignBlockHandler.Hanging.key) {
+        SignBlockHandler.Hanging
     }
-    blockManager.registerHandler(SkullBlockHandler.staticKey) {
-        SkullBlockHandler()
+    blockManager.registerHandler(SkullBlockHandler.key) {
+        SkullBlockHandler
     }
-    blockManager.registerHandler(BannerBlockHandler.staticKey) {
-        BannerBlockHandler()
+    blockManager.registerHandler(BannerBlockHandler.key) {
+        BannerBlockHandler
     }
 
     val instanceManager = MinecraftServer.getInstanceManager()
@@ -54,8 +52,8 @@ fun main() {
     }
 
     val commandManager = MinecraftServer.getCommandManager()
-    commandManager.register(StopCommand())
-    commandManager.register(LookNBTCommand())
+    commandManager.register(StopCommand)
+    commandManager.register(LookNBTCommand)
 
     minecraftServer.start("0.0.0.0", 25565)
 }
