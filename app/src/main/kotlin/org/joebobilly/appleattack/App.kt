@@ -1,6 +1,5 @@
 package org.joebobilly.appleattack
 
-import net.kyori.adventure.key.Key
 import net.minestom.server.Auth
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
@@ -11,11 +10,17 @@ import net.minestom.server.instance.InstanceContainer
 import org.joebobilly.appleattack.blockhandlers.BannerBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SignBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SkullBlockHandler
+import org.joebobilly.appleattack.commands.GiveCommand
 import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.StopCommand
+import org.joebobilly.appleattack.content.items.Apple
+import org.joebobilly.appleattack.items.AAItemManager
 import java.nio.file.Path
 
 fun main() {
+    AAItemManager.register(Apple)
+    AAItemManager.freeze()
+
     val minecraftServer = MinecraftServer.init(Auth.Online())
 
     val blockManager = MinecraftServer.getBlockManager()
@@ -54,6 +59,7 @@ fun main() {
     val commandManager = MinecraftServer.getCommandManager()
     commandManager.register(StopCommand)
     commandManager.register(LookNBTCommand)
+    commandManager.register(GiveCommand)
 
     minecraftServer.start("0.0.0.0", 25565)
 }

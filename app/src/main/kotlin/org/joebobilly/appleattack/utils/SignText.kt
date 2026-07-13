@@ -1,7 +1,6 @@
 package org.joebobilly.appleattack.utils
 
 import net.kyori.adventure.text.Component
-import net.minestom.server.adventure.MinestomAdventure
 import net.minestom.server.color.DyeColor
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
@@ -20,7 +19,7 @@ class SignText(val hasGlowingText: Boolean, val color: DyeColor, val messages: L
         private val color = TagUtils.enumTag<DyeColor>("color").defaultValue(DyeColor.BLACK)
         private val messages = TagUtils.componentListTag("messages").defaultValue(listOf())
 
-        override fun read(reader: TagReadable): SignText? {
+        override fun read(reader: TagReadable): SignText {
             val hasGlowingText = reader.getTag(hasGlowingText)
             val color = reader.getTag(color)
             val messages = reader.getTag(messages)

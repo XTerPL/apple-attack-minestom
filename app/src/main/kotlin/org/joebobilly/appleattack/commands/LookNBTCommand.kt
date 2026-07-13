@@ -2,7 +2,6 @@ package org.joebobilly.appleattack.commands
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.minestom.server.MinecraftServer
 import net.minestom.server.adventure.MinestomAdventure
 import net.minestom.server.command.CommandSender
 import net.minestom.server.command.builder.Command
@@ -23,6 +22,9 @@ object LookNBTCommand : Command("looknbt") {
                 else {
                     sender.sendMessage(Component.text("No NBT found!", NamedTextColor.RED))
                 }
+            }
+            else {
+                sender?.sendMessage(Component.text("This command needs to be performed by a player.", NamedTextColor.RED))
             }
         })
     }
