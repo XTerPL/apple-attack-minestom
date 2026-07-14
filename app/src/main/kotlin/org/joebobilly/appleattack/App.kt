@@ -1,12 +1,15 @@
 package org.joebobilly.appleattack
 
+import net.kyori.adventure.text.Component
 import net.minestom.server.Auth
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
+import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.instance.anvil.AnvilLoader
 import net.minestom.server.instance.InstanceContainer
+import net.minestom.server.network.ConnectionState
 import org.joebobilly.appleattack.blockhandlers.BannerBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SignBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SkullBlockHandler
@@ -15,6 +18,7 @@ import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.StopCommand
 import org.joebobilly.appleattack.content.items.Apple
 import org.joebobilly.appleattack.items.AAItemManager
+import org.joebobilly.appleattack.saves.PlayerSaveManager
 import java.nio.file.Path
 
 fun main() {
@@ -51,9 +55,20 @@ fun main() {
 
     val globalEventHandler = MinecraftServer.getGlobalEventHandler()
     globalEventHandler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
-        event.spawningInstance = instance
-        event.player.respawnPoint = spawnPoint
-        event.player.gameMode = GameMode.ADVENTURE
+        if(PlayerSaveManager.loadPlayer(event.player)) {
+            event.spawningInstance = instance
+            event.player.respawnPoint = spawnPoint
+            event.player.gameMode = GameMode.ADVENTURE
+        }
+        else {
+            event.player.kick(Component.text("Failed to load your progress! (notify an admin)"))
+        }
+    }
+    globalEventHandler.addListener(PlayerDisconnectEvent::class.java) { event ->
+        println("Player ${event.player.username} (${event.player.uuid}) disconnected!")
+        if(event.player.playerConnection.serverState == ConnectionState.PLAY) {
+            PlayerSaveManager.savePlayer(event.player)
+        }
     }
 
     val commandManager = MinecraftServer.getCommandManager()

@@ -10,13 +10,15 @@ import net.minestom.server.item.Material
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
 import net.minestom.server.tag.TagSerializer
+import org.joebobilly.appleattack.utils.TagUtils
 
 abstract class AAItem<METATYPE>(val id: String, private val metaSerializer: TagSerializer<METATYPE>, val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK) {
     companion object {
-        private val idTag = Tag.String("id").map<AAItem<*>>(AAItemManager::getItem, AAItem<*>::id)
+        internal val idTag = Tag.String("id")
+        internal val itemTag = idTag.map<AAItem<*>>(AAItemManager::getItem, AAItem<*>::id)
     }
 
-    private val metaTag = Tag.Structure<METATYPE>("meta", metaSerializer)
+    internal val metaTag = TagUtils.structureSerializeEmptyTag("meta", metaSerializer)
 
     init {
         require(maxCount in 1..99) { "maxCount must be between 1 and 99, got $maxCount" }
@@ -36,7 +38,7 @@ abstract class AAItem<METATYPE>(val id: String, private val metaSerializer: TagS
         update(builder, meta)
         return builder.material(backingMaterial)
                       .maxStackSize(maxCount).amount(count)
-                      .set(idTag, this).set(metaTag, meta).build()
+                      .set(itemTag, this).set(metaTag, meta).build()
     }
 
     // modification
@@ -47,7 +49,7 @@ abstract class AAItem<METATYPE>(val id: String, private val metaSerializer: TagS
 
     // identification
     fun isItem(itemStack: ItemStack): Boolean {
-        return itemStack.getTag(idTag) == this
+        return itemStack.getTag(itemTag) == this
     }
     fun getMeta(itemStack: ItemStack): METATYPE? {
         if(isItem(itemStack)) return itemStack.getTag(metaTag)

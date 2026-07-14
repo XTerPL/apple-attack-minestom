@@ -3,6 +3,7 @@ package org.joebobilly.appleattack.utils
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTag
+import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.text.Component
 import net.minestom.server.MinecraftServer
 import net.minestom.server.adventure.MinestomAdventure
@@ -13,6 +14,8 @@ import net.minestom.server.item.component.BannerPatterns
 import net.minestom.server.network.player.ResolvableProfile
 import net.minestom.server.registry.RegistryTranscoder
 import net.minestom.server.tag.Tag
+import net.minestom.server.tag.TagHandler
+import net.minestom.server.tag.TagSerializer
 import java.util.Locale
 
 object TagUtils {
@@ -49,6 +52,30 @@ object TagUtils {
         return wrapCodecTag(key, codec) {
             Transcoder.NBT
         }
+    }
+
+    fun <R> structureSerializeEmptyTag(key: String, tagSerializer: TagSerializer<R>): Tag<R> {
+        return Tag.NBT(key).map({
+                nbt ->
+                if(nbt !is CompoundBinaryTag) {
+                    null
+                }
+                else {
+                    val handler = TagHandler.fromCompound(nbt)
+                    tagSerializer.read(handler)
+                }
+            }, {
+                value ->
+                if(value == null) {
+                    null
+                }
+                else {
+                    val handler = TagHandler.newHandler()
+                    tagSerializer.write(handler, value)
+                    handler.asCompound()
+                }
+            }
+        )
     }
 
     fun componentListTag(key: String): Tag<List<Component>> {

@@ -1,6 +1,7 @@
 package org.joebobilly.appleattack.items
 
 import net.minestom.server.command.builder.suggestion.SuggestionEntry
+import net.minestom.server.item.ItemStack
 import java.util.*
 
 object AAItemManager {
@@ -32,7 +33,10 @@ object AAItemManager {
         }
         return null
     }
+    fun getItem(itemStack: ItemStack): AAItem<*>? {
+        return itemStack.getTag(AAItem.itemTag)
+    }
     fun getSuggestions(input: String): List<SuggestionEntry> {
-        return items.keys.toList().filter { key -> key.startsWith(input) }.map { key -> SuggestionEntry(key) }
+        return items.keys.toList().filter { key -> key.lowercase().startsWith(input.lowercase()) }.map { key -> SuggestionEntry(key) }
     }
 }
