@@ -15,15 +15,23 @@ import org.joebobilly.appleattack.blockhandlers.SignBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SkullBlockHandler
 import org.joebobilly.appleattack.commands.GiveCommand
 import org.joebobilly.appleattack.commands.LookNBTCommand
+import org.joebobilly.appleattack.commands.SpawnCommand
 import org.joebobilly.appleattack.commands.StopCommand
-import org.joebobilly.appleattack.content.items.Apple
+import org.joebobilly.appleattack.content.items.AppleItem
+import org.joebobilly.appleattack.content.mobs.AppleMob
+import org.joebobilly.appleattack.events.DamageEvents
 import org.joebobilly.appleattack.items.AAItemManager
-import org.joebobilly.appleattack.saves.PlayerSaveManager
+import org.joebobilly.appleattack.mobs.AAMobTypeManager
+import org.joebobilly.appleattack.players.AAPlayer
+import org.joebobilly.appleattack.players.PlayerSaveManager
 import java.nio.file.Path
 
 fun main() {
-    AAItemManager.register(Apple)
+    AAItemManager.register(AppleItem)
     AAItemManager.freeze()
+
+    AAMobTypeManager.register(AppleMob)
+    AAMobTypeManager.freeze()
 
     val minecraftServer = MinecraftServer.init(Auth.Online())
 
@@ -70,11 +78,15 @@ fun main() {
             PlayerSaveManager.savePlayer(event.player)
         }
     }
+    DamageEvents.init(globalEventHandler)
 
     val commandManager = MinecraftServer.getCommandManager()
     commandManager.register(StopCommand)
     commandManager.register(LookNBTCommand)
     commandManager.register(GiveCommand)
+    commandManager.register(SpawnCommand)
+
+    MinecraftServer.getConnectionManager().setPlayerProvider { connection, gameProfile -> AAPlayer(connection, gameProfile) }
 
     minecraftServer.start("0.0.0.0", 25565)
 }

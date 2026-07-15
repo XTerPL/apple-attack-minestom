@@ -10,12 +10,15 @@ import net.minestom.server.item.Material
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
 import net.minestom.server.tag.TagSerializer
+import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.utils.TagUtils
 
-abstract class AAItem<METATYPE>(val id: String, private val metaSerializer: TagSerializer<METATYPE>, val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK) {
+abstract class AAItem<METATYPE>(val id: String,
+                                private val metaSerializer: TagSerializer<METATYPE>,
+                                val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK) {
     companion object {
         internal val idTag = Tag.String("id")
-        internal val itemTag = idTag.map<AAItem<*>>(AAItemManager::getItem, AAItem<*>::id)
+        internal val itemTag = idTag.map<AAItem<*>>(AAItemManager::get, AAItem<*>::id)
     }
 
     internal val metaTag = TagUtils.structureSerializeEmptyTag("meta", metaSerializer)
@@ -63,21 +66,12 @@ abstract class AAItem<METATYPE>(val id: String, private val metaSerializer: TagS
 
     // item definition
     protected abstract fun name(meta: METATYPE): Component
-    protected open fun rarity(meta: METATYPE): AARarity {
-        return AARarity.COMMON
-    }
-    protected open fun itemTypeName(meta: METATYPE): String {
-        return ""
-    }
-    protected open fun description(meta: METATYPE): List<String> {
-        return listOf()
-    }
-    protected open fun itemModel(meta: METATYPE): String {
-        return backingMaterial.key().asString()
-    }
-    protected open fun glow(meta: METATYPE): Boolean {
-        return false
-    }
+    protected open fun rarity(meta: METATYPE): AARarity = AARarity.COMMON
+    protected open fun itemTypeName(meta: METATYPE): String = ""
+    protected open fun description(meta: METATYPE): List<String> = listOf()
+    protected open fun itemModel(meta: METATYPE): String = backingMaterial.key().asString()
+    protected open fun glow(meta: METATYPE): Boolean = false
+    open fun meleeAttack(meta: METATYPE): AttackInfo = AttackInfo.melee(1.0)
 
     private fun lore(meta: METATYPE): List<Component> {
         val lore = mutableListOf<Component>()

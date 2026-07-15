@@ -19,7 +19,7 @@ object ItemStackSerializer : TagSerializer<ItemStack> {
 
     override fun read(reader: TagReadable): ItemStack {
         val id = reader.getTag(AAItem.idTag) ?: return ItemStack.AIR
-        val itemType = AAItemManager.getItem(id) ?: return ItemStack.AIR
+        val itemType = AAItemManager.get(id) ?: return ItemStack.AIR
         val count = reader.getTag(count)
         return readItem(reader, itemType, count)
     }

@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.minestom.server.item.Material
 import org.joebobilly.appleattack.items.BasicAAItem
 
-object Apple : BasicAAItem("apple", backingMaterial = Material.APPLE) {
+object AppleItem : BasicAAItem("apple", backingMaterial = Material.APPLE) {
     override fun name(meta: Unit): Component {
         return Component.text("Apple", NamedTextColor.RED)
     }

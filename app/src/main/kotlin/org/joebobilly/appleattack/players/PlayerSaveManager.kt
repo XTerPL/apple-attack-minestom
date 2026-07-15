@@ -1,4 +1,4 @@
-package org.joebobilly.appleattack.saves
+package org.joebobilly.appleattack.players
 
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.CompoundBinaryTag

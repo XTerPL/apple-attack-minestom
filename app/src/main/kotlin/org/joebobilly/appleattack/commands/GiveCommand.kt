@@ -33,7 +33,7 @@ object GiveCommand : Command("give") {
         addSyntax({ sender: CommandSender?, ctx: CommandContext ->
             if(sender is Player) {
                 val id = ctx.get(idArgument)
-                val itemType = AAItemManager.getItem(id)
+                val itemType = AAItemManager.get(id)
                 if(itemType == null) {
                     sender.sendMessage(Component.text("$id is not a valid item type!", NamedTextColor.RED))
                     return@addSyntax
