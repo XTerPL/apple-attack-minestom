@@ -18,8 +18,10 @@ import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.SpawnCommand
 import org.joebobilly.appleattack.commands.StopCommand
 import org.joebobilly.appleattack.content.items.AppleItem
+import org.joebobilly.appleattack.content.items.GreenAppleItem
 import org.joebobilly.appleattack.content.mobs.AppleMob
 import org.joebobilly.appleattack.events.DamageEvents
+import org.joebobilly.appleattack.events.ItemEvents
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.mobs.AAMobTypeManager
 import org.joebobilly.appleattack.players.AAPlayer
@@ -28,6 +30,7 @@ import java.nio.file.Path
 
 fun main() {
     AAItemManager.register(AppleItem)
+    AAItemManager.register(GreenAppleItem)
     AAItemManager.freeze()
 
     AAMobTypeManager.register(AppleMob)
@@ -79,6 +82,7 @@ fun main() {
         }
     }
     DamageEvents.init(globalEventHandler)
+    ItemEvents.init(globalEventHandler)
 
     val commandManager = MinecraftServer.getCommandManager()
     commandManager.register(StopCommand)

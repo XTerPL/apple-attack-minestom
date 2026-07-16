@@ -21,8 +21,10 @@ object DamageEvents {
     }
 
     private fun playerAttack(event: EntityAttackEvent, attacker: AAPlayer) {
+        if(attacker.isDead) return
+
         val target = event.target
-        if(target !is AAMob) return
+        if(target !is AAMob || target.isDead) return
 
         val weapon = attacker.itemInMainHand
         val weaponType = AAItemManager.getItem(weapon)
@@ -32,8 +34,10 @@ object DamageEvents {
     }
 
     private fun mobAttack(event: EntityAttackEvent, attacker: AAMob) {
+        if(attacker.isDead) return
+
         val target = event.target
-        if(target !is AAPlayer) return
+        if(target !is AAPlayer || target.isDead) return
 
         val attackInfo = attacker.type.meleeAttack(attacker)
 

@@ -20,6 +20,9 @@ class EntityHealth(val entity: LivingEntity, val maxHealth: () -> Double) {
             field = value
             updateBossBar()
         }
+    private var immuneUntil = 0L
+    private var immuneDamage = 0.0
+
     val bossBar = BossBar.bossBar(Component.text(""), 1f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10)
 
     init {
@@ -33,23 +36,50 @@ class EntityHealth(val entity: LivingEntity, val maxHealth: () -> Double) {
         return AAMobType.defaultDamageSound
     }
 
+    private fun calculateDamage(damage: DamageInfo): Double {
+        return damage.attackInfo.damage * damage.attackStrength
+    }
+
     fun dealDamage(damage: DamageInfo) {
         if(entity.isDead) return
-        health -= damage.attackInfo.damage * damage.attackStrength
+
+        // damage calculation
+        var damageAmount = calculateDamage(damage)
+        if(damageAmount < 0) return
+
+        // immunity ticks
+        if(entity.aliveTicks < immuneUntil) {
+            if(damageAmount <= immuneDamage) return
+            damageAmount -= immuneDamage
+            immuneDamage += damageAmount
+        }
+        else {
+            immuneUntil = entity.aliveTicks + 10
+            immuneDamage = damageAmount
+        }
+
+        // subtract health
+        health -= damageAmount
         if(health <= 0) {
             Audiences.players().hideBossBar(bossBar)
             entity.kill()
             return
         }
+
+        // track health
         val attacker = damage.attacker
         if(attacker is AAPlayer) {
             attacker.trackedHealth = this
         }
+
+        // knockback
         val source = damage.source
         if(damage.attackInfo.knockback > 0 && source != null) {
             val knockbackDir = source.position.asVec().sub(entity.position).mul(1.0, 0.0, 1.0).normalize()
             entity.takeKnockback(damage.attackInfo.knockback, knockbackDir.x, knockbackDir.z)
         }
+
+        // damage effects
         entity.sendPacketToViewersAndSelf(DamageEventPacket(
             entity.entityId,
             MinecraftServer.getDamageTypeRegistry().getId(damage.attackInfo.damageType),

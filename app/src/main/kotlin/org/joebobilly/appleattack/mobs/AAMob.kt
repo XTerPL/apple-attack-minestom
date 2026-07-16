@@ -3,6 +3,7 @@ package org.joebobilly.appleattack.mobs
 import net.minestom.server.component.DataComponents
 import net.minestom.server.entity.EntityCreature
 import org.joebobilly.appleattack.damage.EntityHealth
+import org.joebobilly.appleattack.rewards.Reward.Companion.spawnEntities
 
 class AAMob(val type: AAMobType) : EntityCreature(type.startingEntityType) {
     val health = EntityHealth(this, type::maxHealth)
@@ -22,5 +23,9 @@ class AAMob(val type: AAMobType) : EntityCreature(type.startingEntityType) {
     override fun kill() {
         super.kill()
         instance.playSound(type.deathSound(), this)
+        val lootTable = type.onKill(this)
+        lootTable.getRewards().forEach {
+            it.spawnEntities(instance, position.add(0.0, 0.5, 0.0))
+        }
     }
 }

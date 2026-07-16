@@ -11,9 +11,13 @@ import net.minestom.server.entity.ai.target.ClosestEntityTarget
 import net.minestom.server.entity.attribute.Attribute
 import net.minestom.server.entity.metadata.avatar.MannequinMeta
 import net.minestom.server.network.player.ResolvableProfile
+import org.joebobilly.appleattack.content.items.AppleItem
 import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.mobs.AAMob
 import org.joebobilly.appleattack.mobs.AAMobType
+import org.joebobilly.appleattack.rewards.LootTable
+import org.joebobilly.appleattack.rewards.Reward
+import org.joebobilly.appleattack.rewards.Reward.Companion.toLootTableEntry
 import java.time.Duration
 
 object AppleMob : AAMobType("apple", EntityType.MANNEQUIN) {
@@ -29,7 +33,7 @@ object AppleMob : AAMobType("apple", EntityType.MANNEQUIN) {
             it.description = null
         }
         entity.addAIGroup(listOf(
-            MeleeAttackGoal(entity, 1.0, Duration.ofSeconds(1)),
+            MeleeAttackGoal(entity, 1.5, Duration.ofSeconds(1)),
             RandomStrollGoal(entity, 8)
         ), listOf(
             ClosestEntityTarget(entity, 10.0) {
@@ -37,5 +41,12 @@ object AppleMob : AAMobType("apple", EntityType.MANNEQUIN) {
             }
         ))
         entity.getAttribute(Attribute.MOVEMENT_SPEED).baseValue = 0.23
+    }
+
+    override fun onKill(entity: AAMob): LootTable {
+        return LootTable()
+            .addEntry(
+                Reward.Item.of(AppleItem).toLootTableEntry(3, 5)
+            )
     }
 }

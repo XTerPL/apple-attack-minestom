@@ -8,6 +8,7 @@ import net.minestom.server.entity.EntityType
 import net.minestom.server.entity.Player
 import net.minestom.server.instance.Instance
 import org.joebobilly.appleattack.damage.AttackInfo
+import org.joebobilly.appleattack.rewards.LootTable
 
 abstract class AAMobType(val id: String, val startingEntityType: EntityType) {
     companion object {
@@ -30,16 +31,22 @@ abstract class AAMobType(val id: String, val startingEntityType: EntityType) {
 
     }
 
+    open fun onKill(entity: AAMob): LootTable {
+        return LootTable()
+    }
+
     fun create(): AAMob {
         return AAMob(this)
     }
 
-    fun spawn(instance: Instance, position: Pos): AAMob? {
+    fun spawn(instance: Instance, position: Pos, thenRun: ((AAMob) -> Unit)? = null): AAMob? {
         if(shouldDespawn(instance, position)) {
             return null
         }
         val entity = create()
-        entity.setInstance(instance, position)
+        entity.setInstance(instance, position).thenRun {
+            thenRun?.invoke(entity)
+        }
         return entity
     }
 
