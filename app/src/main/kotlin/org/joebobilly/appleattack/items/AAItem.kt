@@ -2,7 +2,6 @@ package org.joebobilly.appleattack.items
 
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.minestom.server.component.DataComponents
 import net.minestom.server.item.ItemStack
@@ -10,8 +9,6 @@ import net.minestom.server.item.Material
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
 import net.minestom.server.tag.TagSerializer
-import org.joebobilly.appleattack.damage.AttackInfo
-import org.joebobilly.appleattack.utils.TagUtils
 
 abstract class AAItem<METATYPE>(val id: String,
                                 private val metaSerializer: TagSerializer<METATYPE>,
@@ -21,14 +18,13 @@ abstract class AAItem<METATYPE>(val id: String,
         internal val itemTag = idTag.map<AAItem<*>>(AAItemManager::get, AAItem<*>::id)
     }
 
-    internal val metaTag = TagUtils.structureSerializeEmptyTag("meta", metaSerializer)
+    internal val metaTag = Tag.Structure("meta", metaSerializer)
+    private val properties = ItemProperty.Map<METATYPE>()
 
     init {
         require(maxCount in 1..99) { "maxCount must be between 1 and 99, got $maxCount" }
         require(backingMaterial != Material.AIR) { "backingMaterial must not be 'AIR'" }
-        require(!AAItemManager.isFrozen()) {
-            "Cannot create item type $id after server startup (did you forget to register this type?)"
-        }
+        AAItemManager.throwIfFrozen { "Cannot create item type $id after server startup (did you forget to register this type?)" }
     }
 
     // creation
@@ -58,6 +54,10 @@ abstract class AAItem<METATYPE>(val id: String,
         if(isItem(itemStack)) return itemStack.getTag(metaTag)
         return null
     }
+    fun getMetaPair(itemStack: ItemStack): AAItemMetaPair<METATYPE>? {
+        val meta = getMeta(itemStack) ?: return null
+        return AAItemMetaPair(this, meta)
+    }
 
     // serialization
     fun deserializeMeta(nbt: CompoundBinaryTag): METATYPE? {
@@ -65,33 +65,60 @@ abstract class AAItem<METATYPE>(val id: String,
     }
 
     // item definition
-    protected abstract fun name(meta: METATYPE): Component
-    protected open fun rarity(meta: METATYPE): AARarity = AARarity.COMMON
-    protected open fun itemTypeName(meta: METATYPE): String = ""
-    protected open fun description(meta: METATYPE): List<String> = listOf()
-    protected open fun itemModel(meta: METATYPE): String = backingMaterial.key().asString()
-    protected open fun glow(meta: METATYPE): Boolean = false
-    open fun meleeAttack(meta: METATYPE): AttackInfo = AttackInfo.melee(1.0)
+
+    fun <T, R> ItemProperty<T, R>.set(provider: (METATYPE) -> R) {
+        setPropertyProvider(this, provider)
+    }
+    fun <T> ItemProperty<T, T>.append(nextProvider: (T, METATYPE) -> T) {
+        check(hasProperty(this)) {
+            "Cannot append another provider for the property $name " +
+                    "when there isn't even a previous provider yet... (use .set instead of .append)"
+        }
+        val entry = properties.getEntry(this)
+        if(entry == null) {
+            set {
+                nextProvider(default!!.invoke(this@AAItem), it)
+            }
+        }
+        else {
+            set {
+                nextProvider(entry.provider(it), it)
+            }
+        }
+    }
+    protected fun <T, R> setPropertyProvider(property: ItemProperty<T, R>, provider: (METATYPE) -> R) {
+        AAItemManager.throwIfFrozen { "Cannot modify a property of item type $id after server startup" }
+        properties.setEntry(property, provider)
+    }
+
+    fun hasProperty(property: ItemProperty<*, *>): Boolean {
+        if(property.default != null) return true
+        return properties.getEntry(property) != null
+    }
+    // throws if property doesn't exist on this item type
+    fun <T, R> getProperty(property: ItemProperty<T, R>, meta: METATYPE): T {
+        val entry = properties.getEntry(property) ?: return property.getDefaultOrThrow(this)
+        return property.postProcess(entry.provider(meta))
+    }
+    fun <T, R, U> withProperty(property: ItemProperty<T, R>, meta: METATYPE, consumer: (T) -> U): U? {
+        if(hasProperty(property)) {
+            return consumer(getProperty(property, meta))
+        }
+        return null
+    }
 
     private fun lore(meta: METATYPE): List<Component> {
         val lore = mutableListOf<Component>()
 
-        val description = description(meta)
-        if(description.isNotEmpty()) {
-            lore.addAll(description.map {
-                line ->
-                Component.empty()
-                    .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
-                    .append(Component.text(line, NamedTextColor.GRAY))
-            })
+        for(entry in LoreProvider.PROPERTY_PROVIDES_LORE) {
+            lore.addAll(entry.getLore(this, meta))
         }
-
-        lore.add(rarity(meta).wrapType(itemTypeName(meta)))
 
         return lore.map { line -> line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
     }
     protected open fun update(builder: ItemStack.Builder, meta: METATYPE) {
-        builder.set(DataComponents.ITEM_NAME, name(meta)).lore(lore(meta)).itemModel(itemModel(meta)).hideExtraTooltip()
-               .glowing(glow(meta))
+        builder.set(DataComponents.ITEM_NAME, getProperty(ItemProperty.NAME, meta)).lore(lore(meta))
+        builder.itemModel(getProperty(ItemProperty.ITEM_MODEL, meta)).hideExtraTooltip()
+        builder.glowing(getProperty(ItemProperty.GLOW, meta))
     }
 }

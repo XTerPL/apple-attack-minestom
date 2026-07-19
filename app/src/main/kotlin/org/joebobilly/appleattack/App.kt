@@ -3,6 +3,7 @@ package org.joebobilly.appleattack
 import net.kyori.adventure.text.Component
 import net.minestom.server.Auth
 import net.minestom.server.MinecraftServer
+import net.minestom.server.ServerFlag
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
@@ -13,28 +14,37 @@ import net.minestom.server.network.ConnectionState
 import org.joebobilly.appleattack.blockhandlers.BannerBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SignBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SkullBlockHandler
+import org.joebobilly.appleattack.commands.AddUpgradeCommand
 import org.joebobilly.appleattack.commands.GiveCommand
 import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.SpawnCommand
 import org.joebobilly.appleattack.commands.StopCommand
-import org.joebobilly.appleattack.content.items.AppleItem
-import org.joebobilly.appleattack.content.items.GreenAppleItem
+import org.joebobilly.appleattack.content.items.Items
 import org.joebobilly.appleattack.content.mobs.AppleMob
+import org.joebobilly.appleattack.content.traits.Traits
 import org.joebobilly.appleattack.events.DamageEvents
 import org.joebobilly.appleattack.events.ItemEvents
 import org.joebobilly.appleattack.items.AAItemManager
+import org.joebobilly.appleattack.items.tools.traits.TraitManager
 import org.joebobilly.appleattack.mobs.AAMobTypeManager
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.players.PlayerSaveManager
 import java.nio.file.Path
 
 fun main() {
-    AAItemManager.register(AppleItem)
-    AAItemManager.register(GreenAppleItem)
+    if(!ServerFlag.SERIALIZE_EMPTY_COMPOUND) {
+        println("Please set the system variable 'minestom.serialization.serialize-empty-nbt-compound' to true")
+        return
+    }
+
+    Items.register()
     AAItemManager.freeze()
 
     AAMobTypeManager.register(AppleMob)
     AAMobTypeManager.freeze()
+
+    Traits.register()
+    TraitManager.freeze()
 
     val minecraftServer = MinecraftServer.init(Auth.Online())
 
@@ -89,6 +99,7 @@ fun main() {
     commandManager.register(LookNBTCommand)
     commandManager.register(GiveCommand)
     commandManager.register(SpawnCommand)
+    commandManager.register(AddUpgradeCommand)
 
     MinecraftServer.getConnectionManager().setPlayerProvider { connection, gameProfile -> AAPlayer(connection, gameProfile) }
 

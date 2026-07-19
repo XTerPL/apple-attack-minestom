@@ -3,10 +3,8 @@ package org.joebobilly.appleattack.utils
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTag
-import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.text.Component
 import net.minestom.server.MinecraftServer
-import net.minestom.server.adventure.MinestomAdventure
 import net.minestom.server.codec.Codec
 import net.minestom.server.codec.Result
 import net.minestom.server.codec.Transcoder
@@ -14,8 +12,7 @@ import net.minestom.server.item.component.BannerPatterns
 import net.minestom.server.network.player.ResolvableProfile
 import net.minestom.server.registry.RegistryTranscoder
 import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagHandler
-import net.minestom.server.tag.TagSerializer
+import net.minestom.server.tag.TagReadable
 import java.util.Locale
 
 object TagUtils {
@@ -29,7 +26,7 @@ object TagUtils {
                 return@map null
             }
         }, {
-            dyeColor -> dyeColor?.name?.lowercase(Locale.getDefault())
+            value -> value?.name?.lowercase(Locale.ROOT)
         })
     }
 
@@ -38,8 +35,9 @@ object TagUtils {
                 nbt ->
                 val result = codec.decode(transcoderSupplier(), nbt)
                 if(result is Result.Error<R>) {
-                    println(MinestomAdventure.tagStringIO().asString(nbt))
-                    println(result.message)
+                    throw NBTReadError("", result.message)
+                    // println(MinestomAdventure.tagStringIO().asString(nbt))
+                    // println(result.message)
                 }
                 result.orElse(null)
             }, {
@@ -52,30 +50,6 @@ object TagUtils {
         return wrapCodecTag(key, codec) {
             Transcoder.NBT
         }
-    }
-
-    fun <R> structureSerializeEmptyTag(key: String, tagSerializer: TagSerializer<R>): Tag<R> {
-        return Tag.NBT(key).map({
-                nbt ->
-                if(nbt !is CompoundBinaryTag) {
-                    null
-                }
-                else {
-                    val handler = TagHandler.fromCompound(nbt)
-                    tagSerializer.read(handler)
-                }
-            }, {
-                value ->
-                if(value == null) {
-                    null
-                }
-                else {
-                    val handler = TagHandler.newHandler()
-                    tagSerializer.write(handler, value)
-                    handler.asCompound()
-                }
-            }
-        )
     }
 
     fun componentListTag(key: String): Tag<List<Component>> {
@@ -98,10 +72,22 @@ object TagUtils {
                 string -> try {
                     return@map Key.key(string)
                 }
-                catch(_: InvalidKeyException) {
-                    return@map null
+                catch(e: InvalidKeyException) {
+                    throw NBTReadError("", "invalid key", e)
                 }
             }, Key::asString
         )
+    }
+
+    fun <T> TagReadable.getTagSourced(tag: Tag<T>): T? {
+        try {
+            return this.getTag(tag)
+        }
+        catch(e: NBTReadError) {
+            throw e.addSource(tag.key())
+        }
+        catch(e: Exception) {
+            throw NBTReadError(tag.key(), e)
+        }
     }
 }

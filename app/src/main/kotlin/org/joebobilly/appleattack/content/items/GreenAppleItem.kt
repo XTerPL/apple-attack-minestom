@@ -4,13 +4,15 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minestom.server.item.Material
 import org.joebobilly.appleattack.items.BasicAAItem
+import org.joebobilly.appleattack.items.ItemProperty
 
 object GreenAppleItem : BasicAAItem("green_apple", backingMaterial = Material.APPLE) {
-    override fun name(meta: Unit): Component {
-        return Component.text("Apple", NamedTextColor.GREEN)
-    }
-
-    override fun description(meta: Unit): List<String> {
-        return listOf("An apple.")
+    init {
+        ItemProperty.NAME.set {
+            Component.text("Apple", NamedTextColor.GREEN)
+        }
+        ItemProperty.DESCRIPTION.set {
+            listOf("An apple.")
+        }
     }
 }

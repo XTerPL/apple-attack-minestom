@@ -12,6 +12,8 @@ enum class AARarity(private val _displayName: String, private val style: Style) 
     EPIC("EPIC", Style.style(NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD)),
     LEGENDARY("LEGENDARY", Style.style(NamedTextColor.GOLD).decorate(TextDecoration.BOLD)),
     FORGED("FORGED", Style.style(NamedTextColor.GOLD).decorate(TextDecoration.ITALIC)),
+    CREATIVE("CREATIVE", Style.style(NamedTextColor.YELLOW)
+        .decorate(TextDecoration.BOLD, TextDecoration.ITALIC)),
     ;
 
     val displayName: Component get() = Component.text(_displayName, style)

@@ -28,7 +28,7 @@ sealed interface Reward {
             val entities = this.createEntities()
             entities.forEach {
                 it.setInstance(instance, position)
-                it.velocity = Random.nextVec2(0.1, 0.1).add(0.0, 0.2, 0.0)
+                it.velocity = Random.nextVec2(2.0, 2.0).add(0.0, 4.0, 0.0)
             }
             return entities
         }

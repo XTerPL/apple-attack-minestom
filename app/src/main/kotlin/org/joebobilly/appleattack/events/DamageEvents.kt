@@ -2,11 +2,9 @@ package org.joebobilly.appleattack.events
 
 import net.minestom.server.event.GlobalEventHandler
 import net.minestom.server.event.entity.EntityAttackEvent
-import net.minestom.server.item.ItemStack
-import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.damage.DamageInfo
-import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.AAItemManager
+import org.joebobilly.appleattack.items.ItemProperty
 import org.joebobilly.appleattack.mobs.AAMob
 import org.joebobilly.appleattack.players.AAPlayer
 
@@ -26,9 +24,7 @@ object DamageEvents {
         val target = event.target
         if(target !is AAMob || target.isDead) return
 
-        val weapon = attacker.itemInMainHand
-        val weaponType = AAItemManager.getItem(weapon)
-        val attackInfo = getMeleeAttack(weapon, weaponType)
+        val attackInfo = AAItemManager.getItemProperty(attacker.itemInMainHand, ItemProperty.MELEE_ATTACK)
 
         target.health.dealDamage(DamageInfo.of(attackInfo, attacker))
     }
@@ -42,10 +38,5 @@ object DamageEvents {
         val attackInfo = attacker.type.meleeAttack(attacker)
 
         target.health.dealDamage(DamageInfo.of(attackInfo, attacker))
-    }
-
-    private fun <T> getMeleeAttack(weapon: ItemStack, weaponType: AAItem<T>?): AttackInfo {
-        val meta = weaponType?.getMeta(weapon) ?: return AttackInfo.melee(1.0)
-        return weaponType.meleeAttack(meta)
     }
 }

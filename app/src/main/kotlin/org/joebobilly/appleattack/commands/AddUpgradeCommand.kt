@@ -8,14 +8,16 @@ import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.CommandContext
 import net.minestom.server.command.builder.arguments.ArgumentType
 import net.minestom.server.entity.Player
-import net.minestom.server.inventory.TransactionOption
 import org.joebobilly.appleattack.items.AAItemManager
+import org.joebobilly.appleattack.items.AAItemMetaPair
+import org.joebobilly.appleattack.items.tools.ToolMeta
+import org.joebobilly.appleattack.items.tools.type.ToolItem
 import org.joebobilly.appleattack.utils.CommandUtils
 
-object GiveCommand : Command("give") {
+object AddUpgradeCommand : Command("addupgrade") {
     init {
         defaultExecutor = { sender: CommandSender?, _: CommandContext ->
-            sender?.sendMessage(Component.text("Syntax: /give <id> [count] [meta nbt]", NamedTextColor.RED))
+            sender?.sendMessage(Component.text("Syntax: /addupgrade <id> [meta nbt]", NamedTextColor.RED))
         }
 
         val idArgument = ArgumentType.String("id")
@@ -25,8 +27,6 @@ object GiveCommand : Command("give") {
                 entry -> suggestion.addEntry(entry)
             }
         }
-
-        val countArgument = ArgumentType.Integer("count").setDefaultValue(1)
 
         val metaNbtArgument = ArgumentType.NbtCompound("meta_nbt").setDefaultValue(CompoundBinaryTag.empty())
 
@@ -38,26 +38,31 @@ object GiveCommand : Command("give") {
                     sender.sendMessage(Component.text("$id is not a valid item type!", NamedTextColor.RED))
                     return@addSyntax
                 }
-                val count = ctx.get(countArgument)
-                if(count !in 1..itemType.maxCount) {
-                    sender.sendMessage(Component.text("Count needs to be between 1 and ${itemType.maxCount}, found $count!", NamedTextColor.RED))
-                    return@addSyntax
-                }
                 val metaNbt = ctx.get(metaNbtArgument)
                 val metaPair = CommandUtils.parseItemMetaPair(sender, itemType, metaNbt) ?: return@addSyntax
-                val itemStack = metaPair.create(count)
-                val remainingCount = sender.inventory.addItemStack(itemStack, TransactionOption.ALL).amount()
-                val given = count - remainingCount
-                if(given > 0) {
-                    sender.sendMessage(Component.text("Given $given x ${itemType.id}", NamedTextColor.GREEN))
+                val toolType = AAItemManager.getItem(sender.itemInMainHand)
+                if(toolType is ToolItem<*>) {
+                    upgradeTool(sender, toolType, metaPair)
                 }
                 else {
-                    sender.sendMessage(Component.text("Failed to give any ${itemType.id}", NamedTextColor.RED))
+                    sender.sendMessage(Component.text("Cannot upgrade a non-tool item", NamedTextColor.RED))
                 }
             }
             else {
                 sender?.sendMessage(Component.text("This command needs to be performed by a player.", NamedTextColor.RED))
             }
-        }, idArgument, countArgument, metaNbtArgument)
+        }, idArgument, metaNbtArgument)
+    }
+
+    private fun <T : ToolMeta> upgradeTool(player: Player, toolType: ToolItem<T>, upgrade: AAItemMetaPair<*>) {
+        player.itemInMainHand = toolType.update(player.itemInMainHand) {
+            if(toolType.safelyAddUpgradeToMeta(it, upgrade)) {
+                player.sendMessage(Component.text("Upgraded tool with ${upgrade.itemType.id}", NamedTextColor.GREEN))
+            }
+            else {
+                player.sendMessage(Component.text("Failed to upgrade tool with ${upgrade.itemType.id}", NamedTextColor.RED))
+            }
+            it
+        }
     }
 }
