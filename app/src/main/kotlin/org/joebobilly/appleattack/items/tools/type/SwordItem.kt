@@ -19,6 +19,10 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSeria
     object Forged : SwordItem<ForgedToolMeta<Recipe>>("forged_sword",
         ForgedToolMeta.Serializer(Recipe.Serializer)
     ) {
+        init {
+            initForged()
+        }
+
         override fun defineTool(
             meta: ForgedToolMeta<Recipe>,
             builder: ToolDefinition.Builder
@@ -38,6 +42,10 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSeria
             requireMaterialType<ForgeMaterial.Handle>(handle, "handle")
             requireMaterialType<ForgeMaterial.Attack>(bladeDown, "blade_down")
             requireMaterialType<ForgeMaterial.Attack>(bladeUp, "blade_up")
+        }
+
+        override fun getCoreMaterial(): AAItemMetaPair<*> {
+            return bladeDown
         }
 
         object Serializer : TagSerializer<Recipe> {

@@ -19,6 +19,8 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
             }
         }
 
+        abstract fun getCoreMaterial(): AAItemMetaPair<*>
+
         companion object {
             inline fun <reified T : ForgeMaterial> requireMaterialType(itemMetaPair: AAItemMetaPair<*>, pieceName: String) {
                 val materialName = T::class.simpleName ?: "Unknown"
@@ -31,6 +33,10 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
 
     fun getForgeMaterials() : List<ForgeMaterial> {
         return recipe.forgeMaterials.map { it.getProperty(ItemProperty.FORGE_MATERIAL) }
+    }
+
+    fun getCoreMaterial(): ForgeMaterial {
+        return recipe.getCoreMaterial().getProperty(ItemProperty.FORGE_MATERIAL)
     }
 
     class Serializer<RECIPE : Recipe>(recipeSerializer: TagSerializer<RECIPE>) : TagSerializer<ForgedToolMeta<RECIPE>> {

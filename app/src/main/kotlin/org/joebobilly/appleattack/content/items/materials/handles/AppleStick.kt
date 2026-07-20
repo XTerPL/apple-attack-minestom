@@ -16,7 +16,7 @@ object AppleStick : BasicAAItem("apple_stick", backingMaterial = Material.STICK)
             listOf("The stem of an apple, I guess?")
         }
         ItemProperty.FORGE_MATERIAL.set {
-            ForgeMaterial.Handle(0, emptyMap())
+            ForgeMaterial.Handle(ForgeMaterial.Definition(0, emptyMap()))
         }
     }
 }

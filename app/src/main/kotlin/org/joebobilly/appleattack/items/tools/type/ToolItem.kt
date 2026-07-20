@@ -1,14 +1,19 @@
 package org.joebobilly.appleattack.items.tools.type
 
 import net.minestom.server.item.ItemStack
+import net.minestom.server.item.Material
 import net.minestom.server.tag.TagSerializer
 import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.AAItemMetaPair
+import org.joebobilly.appleattack.items.AARarity
 import org.joebobilly.appleattack.items.ItemProperty
+import org.joebobilly.appleattack.items.tools.ForgeMaterial
+import org.joebobilly.appleattack.items.tools.ForgedToolMeta
 import org.joebobilly.appleattack.items.tools.ToolMeta
+import org.joebobilly.appleattack.items.icons.ItemIcon
 
-sealed class ToolItem<METATYPE : ToolMeta>(id: String, toolType: ToolType, metaSerializer: TagSerializer<METATYPE>)
+sealed class ToolItem<METATYPE : ToolMeta>(id: String, val toolType: ToolType, metaSerializer: TagSerializer<METATYPE>)
     : AAItem<METATYPE>(id, metaSerializer, 1) {
     init {
         ItemProperty.TOOL_DATA.set {
@@ -43,4 +48,16 @@ sealed class ToolItem<METATYPE : ToolMeta>(id: String, toolType: ToolType, metaS
     }
 
     protected abstract fun defineTool(meta: METATYPE, builder: ToolDefinition.Builder)
+
+    companion object {
+        fun <RECIPE : ForgedToolMeta.Recipe> ToolItem<ForgedToolMeta<RECIPE>>.initForged() {
+            setPropertyProvider(ItemProperty.NAME) {
+                ForgeMaterial.getName(it.getForgeMaterials(), this.toolType)
+            }
+            setPropertyProvider(ItemProperty.ICON) {
+                it.getCoreMaterial().definition.icon ?: ItemIcon(Material.BARRIER)
+            }
+            setPropertyProvider(ItemProperty.RARITY) { AARarity.FORGED }
+        }
+    }
 }

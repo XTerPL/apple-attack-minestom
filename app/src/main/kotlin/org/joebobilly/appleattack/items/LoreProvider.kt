@@ -7,12 +7,7 @@ interface LoreProvider {
     companion object {
         val PROPERTY_PROVIDES_LORE: List<LoreProviderEntry<*>> = listOf(
             LoreProviderEntry(ItemProperty.DESCRIPTION) {
-                value, metaPair -> value.map {
-                        line ->
-                    Component.empty()
-                        .append(Component.text("» ", NamedTextColor.DARK_GRAY))
-                        .append(Component.text(line, NamedTextColor.GRAY))
-                }
+                value, metaPair -> formatDescription(value)
             },
             LoreProviderEntry(ItemProperty.RARITY) {
                 value, metaPair ->
@@ -36,6 +31,13 @@ interface LoreProvider {
         fun wrapList(property: ItemProperty<List<Component>, *>): LoreProviderEntry<List<Component>> {
             return LoreProviderEntry(property) {
                     value, metaPair -> value
+            }
+        }
+
+        fun formatDescription(description: List<String>): List<Component> {
+            return description.map { line -> Component.empty()
+                .append(Component.text("» ", NamedTextColor.DARK_GRAY))
+                .append(Component.text(line, NamedTextColor.GRAY))
             }
         }
     }

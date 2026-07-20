@@ -6,6 +6,7 @@ import net.minestom.server.item.Material
 import org.joebobilly.appleattack.items.BasicAAItem
 import org.joebobilly.appleattack.items.ItemProperty
 import org.joebobilly.appleattack.items.tools.ForgeMaterial
+import org.joebobilly.appleattack.items.icons.ItemIcon
 
 object AppleSeed : BasicAAItem("apple_seed", backingMaterial = Material.INK_SAC) {
     init {
@@ -16,7 +17,13 @@ object AppleSeed : BasicAAItem("apple_seed", backingMaterial = Material.INK_SAC)
             listOf("And you're gonna use it", "to make a weapon, sure.")
         }
         ItemProperty.FORGE_MATERIAL.set {
-            ForgeMaterial.Attack(3.0, 1, emptyMap())
+            ForgeMaterial.Attack(3.0,
+                ForgeMaterial.Definition(
+                    1, emptyMap(),
+                    partName = "Apple", color = NamedTextColor.DARK_GRAY,
+                    icon = ItemIcon(Material.STONE_SWORD)
+                )
+            )
         }
     }
 }

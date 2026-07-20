@@ -15,6 +15,7 @@ import org.joebobilly.appleattack.blockhandlers.BannerBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SignBlockHandler
 import org.joebobilly.appleattack.blockhandlers.SkullBlockHandler
 import org.joebobilly.appleattack.commands.AddUpgradeCommand
+import org.joebobilly.appleattack.commands.ForgeCommand
 import org.joebobilly.appleattack.commands.GiveCommand
 import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.SpawnCommand
@@ -23,6 +24,7 @@ import org.joebobilly.appleattack.content.items.Items
 import org.joebobilly.appleattack.content.mobs.AppleMob
 import org.joebobilly.appleattack.content.traits.Traits
 import org.joebobilly.appleattack.events.DamageEvents
+import org.joebobilly.appleattack.events.InventoryEvents
 import org.joebobilly.appleattack.events.ItemEvents
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.tools.traits.TraitManager
@@ -93,6 +95,7 @@ fun main() {
     }
     DamageEvents.init(globalEventHandler)
     ItemEvents.init(globalEventHandler)
+    InventoryEvents.init(globalEventHandler)
 
     val commandManager = MinecraftServer.getCommandManager()
     commandManager.register(StopCommand)
@@ -100,6 +103,7 @@ fun main() {
     commandManager.register(GiveCommand)
     commandManager.register(SpawnCommand)
     commandManager.register(AddUpgradeCommand)
+    commandManager.register(ForgeCommand)
 
     MinecraftServer.getConnectionManager().setPlayerProvider { connection, gameProfile -> AAPlayer(connection, gameProfile) }
 

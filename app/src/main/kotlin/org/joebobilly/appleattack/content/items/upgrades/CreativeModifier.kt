@@ -8,6 +8,7 @@ import org.joebobilly.appleattack.items.AARarity
 import org.joebobilly.appleattack.items.BasicAAItem
 import org.joebobilly.appleattack.items.ItemProperty
 import org.joebobilly.appleattack.items.tools.ForgeUpgradeData
+import org.joebobilly.appleattack.items.icons.ItemIcon
 
 object CreativeModifier : BasicAAItem("creative_modifier", backingMaterial = Material.GOLD_INGOT) {
     init {
@@ -16,6 +17,9 @@ object CreativeModifier : BasicAAItem("creative_modifier", backingMaterial = Mat
         }
         ItemProperty.DESCRIPTION.set {
             listOf("Gives an extra modifier, infinitely.")
+        }
+        ItemProperty.ICON.set {
+            ItemIcon(Material.GOLD_INGOT)
         }
         ItemProperty.GLOW.set { true }
         ItemProperty.RARITY.set { AARarity.CREATIVE }

@@ -13,20 +13,19 @@ import net.minestom.server.network.player.ResolvableProfile
 import net.minestom.server.registry.RegistryTranscoder
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
-import java.util.Locale
 
 object TagUtils {
     inline fun <reified R : Enum<R>> enumTag(key: String): Tag<R> {
         return Tag.String(key).map({
             string ->
             try {
-                return@map enumValueOf<R>(string.uppercase(Locale.ROOT))
+                return@map enumValueOf<R>(string.uppercase())
             }
             catch(_: IllegalArgumentException) {
                 return@map null
             }
         }, {
-            value -> value?.name?.lowercase(Locale.ROOT)
+            value -> value?.name?.lowercase()
         })
     }
 

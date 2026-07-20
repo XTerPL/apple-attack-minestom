@@ -2,10 +2,12 @@ package org.joebobilly.appleattack.items
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minestom.server.item.Material
 import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.items.tools.ForgeMaterial
 import org.joebobilly.appleattack.items.tools.ForgeUpgradeData
 import org.joebobilly.appleattack.items.tools.ToolData
+import org.joebobilly.appleattack.items.icons.ItemIcon
 
 class ItemProperty<T, R> private constructor(
     val name: String,
@@ -13,13 +15,13 @@ class ItemProperty<T, R> private constructor(
     val default: ((AAItem<*>?) -> T)? = null,
 ) {
     companion object {
-        val NAME = of("name") {
+        val NAME = of<Component>("name") {
             Component.text(it?.let { "Unknown Item: ${it.id}" } ?: "Invalid Item", NamedTextColor.DARK_RED)
         }
         val DESCRIPTION = of<List<String>>("description") { emptyList() }
         val RARITY = of("rarity", AARarity.COMMON)
         val ITEM_TYPE_NAME = of<String>("item_type_name")
-        val ITEM_MODEL = of("item_model") { it?.backingMaterial?.key()?.asString() ?: "minecraft:barrier" }
+        val ICON = of("icon") { ItemIcon(it?.backingMaterial ?: Material.BARRIER) }
         val GLOW = of("glow", false)
 
         val EXTRA_LORE = of<List<Component>>("extra_lore") { emptyList() }

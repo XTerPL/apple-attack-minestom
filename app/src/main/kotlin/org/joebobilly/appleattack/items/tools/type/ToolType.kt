@@ -2,8 +2,8 @@ package org.joebobilly.appleattack.items.tools.type
 
 import org.joebobilly.appleattack.items.tools.ToolStat
 
-enum class ToolType(vararg providedStats: ToolStat<*>) {
-    SWORD(ToolStat.ATTACK);
+enum class ToolType(val displayName: String, vararg providedStats: ToolStat<*>) {
+    SWORD("Sword", ToolStat.ATTACK);
 
     val providedStats: List<ToolStat<*>>
     init {

@@ -86,7 +86,7 @@ abstract class AAItem<METATYPE>(val id: String,
             }
         }
     }
-    protected fun <T, R> setPropertyProvider(property: ItemProperty<T, R>, provider: (METATYPE) -> R) {
+    internal fun <T, R> setPropertyProvider(property: ItemProperty<T, R>, provider: (METATYPE) -> R) {
         AAItemManager.throwIfFrozen { "Cannot modify a property of item type $id after server startup" }
         properties.setEntry(property, provider)
     }
@@ -117,8 +117,8 @@ abstract class AAItem<METATYPE>(val id: String,
         return lore.map { line -> line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
     }
     protected open fun update(builder: ItemStack.Builder, meta: METATYPE) {
-        builder.set(DataComponents.ITEM_NAME, getProperty(ItemProperty.NAME, meta)).lore(lore(meta))
-        builder.itemModel(getProperty(ItemProperty.ITEM_MODEL, meta)).hideExtraTooltip()
+        builder.set(DataComponents.ITEM_NAME, getProperty(ItemProperty.NAME, meta)).lore(lore(meta)).hideExtraTooltip()
+        getProperty(ItemProperty.ICON, meta).apply(builder)
         builder.glowing(getProperty(ItemProperty.GLOW, meta))
     }
 }

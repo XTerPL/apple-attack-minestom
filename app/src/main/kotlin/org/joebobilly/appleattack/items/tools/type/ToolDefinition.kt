@@ -22,7 +22,7 @@ class ToolDefinition private constructor(
         }
 
         fun addMaterial(material: ForgeMaterial): Builder {
-            material.traitsAdded.forEach {
+            material.definition.traitsAdded.forEach {
                 addTrait(it.key, it.value)
             }
             material.getStats().forEach {
