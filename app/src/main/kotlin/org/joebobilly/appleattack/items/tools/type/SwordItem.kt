@@ -10,8 +10,7 @@ import org.joebobilly.appleattack.items.tools.ForgeMaterial
 import org.joebobilly.appleattack.items.tools.ForgedToolMeta
 import org.joebobilly.appleattack.items.tools.ToolMeta
 import org.joebobilly.appleattack.items.tools.ToolStat
-import org.joebobilly.appleattack.utils.NBTReadError
-import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
+import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 
 sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSerializer<METATYPE>)
     : ToolItem<METATYPE>(id, ToolType.SWORD, metaSerializer) {
@@ -55,9 +54,9 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSeria
 
             override fun read(reader: TagReadable): Recipe {
                 return Recipe(
-                    reader.getTagSourced(handle) ?: throw NBTReadError("handle", "not found"),
-                    reader.getTagSourced(bladeDown) ?: throw NBTReadError("blade_down", "not found"),
-                    reader.getTagSourced(bladeUp) ?: throw NBTReadError("blade_up", "not found")
+                    reader.getTagOrThrow(handle),
+                    reader.getTagOrThrow(bladeDown),
+                    reader.getTagOrThrow(bladeUp)
                 )
             }
 

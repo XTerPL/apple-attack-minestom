@@ -8,6 +8,7 @@ import net.minestom.server.MinecraftServer
 import net.minestom.server.codec.Codec
 import net.minestom.server.codec.Result
 import net.minestom.server.codec.Transcoder
+import net.minestom.server.coordinate.Pos
 import net.minestom.server.item.component.BannerPatterns
 import net.minestom.server.network.player.ResolvableProfile
 import net.minestom.server.registry.RegistryTranscoder
@@ -78,6 +79,21 @@ object TagUtils {
         )
     }
 
+    fun posTag(key: String): Tag<Pos> {
+        return Tag.Double(key).list().map(
+            {
+                list ->
+                when (list.size) {
+                    3 -> Pos(list[0], list[1], list[2])
+                    5 -> Pos(list[0], list[1], list[2], list[3].toFloat(), list[4].toFloat())
+                    else -> throw NBTReadError("", "invalid list size: must be 3 or 5")
+                }
+            }, {
+                pos -> listOf(pos.x, pos.y, pos.z, pos.yaw.toDouble(), pos.pitch.toDouble())
+            }
+        )
+    }
+
     fun <T> TagReadable.getTagSourced(tag: Tag<T>): T? {
         try {
             return this.getTag(tag)
@@ -88,5 +104,13 @@ object TagUtils {
         catch(e: Exception) {
             throw NBTReadError(tag.key(), e)
         }
+    }
+
+    fun <T> TagReadable.getTagOrThrow(tag: Tag<T>): T {
+        return this.getTagSourced(tag) ?: throw NBTReadError(tag.key(), "not found or null")
+    }
+
+    fun checkOrThrow(condition: Boolean, source: String, lazyMessage: () -> String) {
+        if(!condition) throw NBTReadError(source, lazyMessage())
     }
 }

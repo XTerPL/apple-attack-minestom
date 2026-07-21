@@ -6,7 +6,6 @@ import net.minestom.server.entity.EntityType
 import net.minestom.server.entity.Player
 import net.minestom.server.entity.PlayerSkin
 import net.minestom.server.entity.ai.goal.MeleeAttackGoal
-import net.minestom.server.entity.ai.goal.RandomStrollGoal
 import net.minestom.server.entity.ai.target.ClosestEntityTarget
 import net.minestom.server.entity.attribute.Attribute
 import net.minestom.server.entity.metadata.avatar.MannequinMeta
@@ -15,6 +14,7 @@ import org.joebobilly.appleattack.content.items.AppleItem
 import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.mobs.AAMob
 import org.joebobilly.appleattack.mobs.AAMobType
+import org.joebobilly.appleattack.mobs.HomeStrollGoal
 import org.joebobilly.appleattack.rewards.LootTable
 import org.joebobilly.appleattack.rewards.Reward
 import org.joebobilly.appleattack.rewards.Reward.Companion.toLootTableEntry
@@ -34,7 +34,7 @@ object AppleMob : AAMobType("apple", EntityType.MANNEQUIN) {
         }
         entity.addAIGroup(listOf(
             MeleeAttackGoal(entity, 1.5, Duration.ofSeconds(1)),
-            RandomStrollGoal(entity, 8)
+            HomeStrollGoal(entity, 8) { entity.homePosition }
         ), listOf(
             ClosestEntityTarget(entity, 10.0) {
                 it is Player

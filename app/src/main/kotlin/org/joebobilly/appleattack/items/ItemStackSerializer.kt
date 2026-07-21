@@ -6,7 +6,7 @@ import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
 import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
-import org.joebobilly.appleattack.utils.NBTReadError
+import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
 import java.util.logging.Logger
 
@@ -25,7 +25,7 @@ object ItemStackSerializer : TagSerializer<ItemStack> {
     }
 
     private fun <METATYPE> readItem(reader: TagReadable, itemType: AAItem<METATYPE>, count: Int): ItemStack {
-        val meta = reader.getTagSourced(itemType.metaTag) ?: throw NBTReadError("meta", "not found")
+        val meta = reader.getTagOrThrow(itemType.metaTag)
         return itemType.create(count, meta)
     }
 

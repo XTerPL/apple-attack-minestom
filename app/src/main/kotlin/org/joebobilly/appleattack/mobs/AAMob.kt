@@ -1,12 +1,14 @@
 package org.joebobilly.appleattack.mobs
 
 import net.minestom.server.component.DataComponents
+import net.minestom.server.coordinate.Vec
 import net.minestom.server.entity.EntityCreature
 import org.joebobilly.appleattack.damage.EntityHealth
 import org.joebobilly.appleattack.rewards.Reward.Companion.spawnEntities
 
 class AAMob(val type: AAMobType) : EntityCreature(type.startingEntityType) {
     val health = EntityHealth(this, type::maxHealth)
+    var homePosition: Vec? = null
 
     init {
         set(DataComponents.CUSTOM_NAME, type.entityName())

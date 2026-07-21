@@ -24,6 +24,7 @@ import org.joebobilly.appleattack.content.items.Items
 import org.joebobilly.appleattack.content.mobs.AppleMob
 import org.joebobilly.appleattack.content.traits.Traits
 import org.joebobilly.appleattack.events.DamageEvents
+import org.joebobilly.appleattack.events.InstanceEvents
 import org.joebobilly.appleattack.events.InventoryEvents
 import org.joebobilly.appleattack.events.ItemEvents
 import org.joebobilly.appleattack.items.AAItemManager
@@ -31,6 +32,8 @@ import org.joebobilly.appleattack.items.tools.traits.TraitManager
 import org.joebobilly.appleattack.mobs.AAMobTypeManager
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.players.PlayerSaveManager
+import org.joebobilly.appleattack.spawners.MobSpawner
+import org.joebobilly.appleattack.spawners.SpawnerManager
 import java.nio.file.Path
 
 fun main() {
@@ -64,6 +67,13 @@ fun main() {
         BannerBlockHandler
     }
 
+    // the instance events have to be registered before the instance gets registered
+    val globalEventHandler = MinecraftServer.getGlobalEventHandler()
+    DamageEvents.init(globalEventHandler)
+    ItemEvents.init(globalEventHandler)
+    InventoryEvents.init(globalEventHandler)
+    InstanceEvents.init(globalEventHandler)
+
     val instanceManager = MinecraftServer.getInstanceManager()
     val instance: InstanceContainer = instanceManager.createInstanceContainer()
     val cwd = Path.of("").toAbsolutePath()
@@ -74,9 +84,16 @@ fun main() {
 
     instance.chunkLoader = AnvilLoader(worldPath)
 
+    SpawnerManager.registerSpawner(
+        MobSpawner(AppleMob, 5, listOf(
+            Pos(-20.5, 57.0, 88.5),
+            Pos(-15.5, 57.0, 86.5),
+            Pos(-24.5, 57.0, 83.5)
+        )), instance
+    )
+
     val spawnPoint = Pos(-8.0, 57.0, 64.0)
 
-    val globalEventHandler = MinecraftServer.getGlobalEventHandler()
     globalEventHandler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         if(PlayerSaveManager.loadPlayer(event.player)) {
             event.spawningInstance = instance
@@ -93,9 +110,9 @@ fun main() {
             PlayerSaveManager.savePlayer(event.player)
         }
     }
-    DamageEvents.init(globalEventHandler)
-    ItemEvents.init(globalEventHandler)
-    InventoryEvents.init(globalEventHandler)
+
+    val schedulerManager = MinecraftServer.getSchedulerManager()
+    SpawnerManager.init(schedulerManager)
 
     val commandManager = MinecraftServer.getCommandManager()
     commandManager.register(StopCommand)

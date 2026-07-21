@@ -5,8 +5,7 @@ import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
 import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
-import org.joebobilly.appleattack.utils.NBTReadError
-import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
+import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 
 data class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, val meta: METATYPE) {
     companion object {
@@ -44,12 +43,12 @@ data class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, val meta: ME
 
     object Serializer : TagSerializer<AAItemMetaPair<*>> {
         override fun read(reader: TagReadable): AAItemMetaPair<*> {
-            val itemType = reader.getTagSourced(AAItem.itemTag) ?: throw NBTReadError("id", "not found")
+            val itemType = reader.getTagOrThrow(AAItem.itemTag)
             return readPair(reader, itemType)
         }
 
         private fun <METATYPE> readPair(reader: TagReadable, itemType: AAItem<METATYPE>): AAItemMetaPair<*> {
-            val meta = reader.getTagSourced(itemType.metaTag) ?: throw NBTReadError("meta", "not found")
+            val meta = reader.getTagOrThrow(itemType.metaTag)
             return AAItemMetaPair(itemType, meta)
         }
 

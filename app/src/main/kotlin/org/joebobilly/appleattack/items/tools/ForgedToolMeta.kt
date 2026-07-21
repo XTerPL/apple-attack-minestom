@@ -6,8 +6,7 @@ import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.ItemProperty
-import org.joebobilly.appleattack.utils.NBTReadError
-import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
+import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 
 class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolMeta() {
     abstract class Recipe(internal val forgeMaterials : List<AAItemMetaPair<*>>) {
@@ -43,7 +42,7 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
         private val recipe = Tag.Structure("recipe", recipeSerializer)
 
         override fun read(reader: TagReadable): ForgedToolMeta<RECIPE> {
-            val recipe = reader.getTagSourced(recipe) ?: throw NBTReadError("recipe", "not found")
+            val recipe = reader.getTagOrThrow(recipe)
             return ToolMeta.Serializer.read(reader).withRecipe(recipe)
         }
 

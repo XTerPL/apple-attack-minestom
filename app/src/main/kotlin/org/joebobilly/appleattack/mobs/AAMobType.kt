@@ -44,6 +44,7 @@ abstract class AAMobType(val id: String, val startingEntityType: EntityType) {
             return null
         }
         val entity = create()
+        entity.homePosition = position.asVec()
         entity.setInstance(instance, position).thenRun {
             thenRun?.invoke(entity)
         }
