@@ -1,4 +1,4 @@
-package org.joebobilly.appleattack.spawners
+package org.joebobilly.appleattack.entities.spawners
 
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Entity
@@ -7,8 +7,9 @@ import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
 import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
-import org.joebobilly.appleattack.mobs.AAMobType
-import org.joebobilly.appleattack.mobs.AAMobTypeManager
+import org.joebobilly.appleattack.entities.AAEntityTypeManager
+import org.joebobilly.appleattack.entities.type.AAMobType
+import org.joebobilly.appleattack.utils.NBTReadError
 import org.joebobilly.appleattack.utils.RandomUtils.pickFrom
 import org.joebobilly.appleattack.utils.TagUtils
 import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
@@ -29,7 +30,12 @@ class MobSpawner(val mobType: AAMobType, maxSpawned: Int, val positions: List<Po
     }
 
     object Serializer : TagSerializer<MobSpawner> {
-        val mobType: Tag<AAMobType> = Tag.String("id").map(AAMobTypeManager::get, AAMobType::id)
+        val mobType: Tag<AAMobType> = Tag.String("id").map(
+            {
+                val type = AAEntityTypeManager.get(it)
+                type as? AAMobType ?: throw NBTReadError("", "$type is not a mob type!")
+            }, AAMobType::id
+        )
         val maxSpawned: Tag<Int> = Tag.Integer("max_spawned")
         val positions: Tag<List<Pos>> = TagUtils.posTag("positions").list()
 

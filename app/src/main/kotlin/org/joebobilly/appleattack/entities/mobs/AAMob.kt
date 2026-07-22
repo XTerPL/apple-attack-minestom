@@ -1,19 +1,14 @@
-package org.joebobilly.appleattack.mobs
+package org.joebobilly.appleattack.entities.mobs
 
-import net.minestom.server.component.DataComponents
 import net.minestom.server.coordinate.Vec
 import net.minestom.server.entity.EntityCreature
 import org.joebobilly.appleattack.damage.EntityHealth
+import org.joebobilly.appleattack.entities.type.AAMobType
 import org.joebobilly.appleattack.rewards.Reward.Companion.spawnEntities
 
-class AAMob(val type: AAMobType) : EntityCreature(type.startingEntityType) {
+class AAMob internal constructor(val type: AAMobType) : EntityCreature(type.startingEntityType) {
     val health = EntityHealth(this, type::maxHealth)
     var homePosition: Vec? = null
-
-    init {
-        set(DataComponents.CUSTOM_NAME, type.entityName())
-        type.onInit(this)
-    }
 
     override fun update(time: Long) {
         super.update(time)

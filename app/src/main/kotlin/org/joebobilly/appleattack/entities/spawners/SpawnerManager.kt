@@ -1,4 +1,4 @@
-package org.joebobilly.appleattack.spawners
+package org.joebobilly.appleattack.entities.spawners
 
 import net.minestom.server.instance.Instance
 import net.minestom.server.timer.SchedulerManager

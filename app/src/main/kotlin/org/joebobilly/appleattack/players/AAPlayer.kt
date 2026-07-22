@@ -4,7 +4,8 @@ import net.minestom.server.entity.Player
 import net.minestom.server.network.player.GameProfile
 import net.minestom.server.network.player.PlayerConnection
 import org.joebobilly.appleattack.damage.EntityHealth
-import org.joebobilly.appleattack.mobs.AAMobType
+import org.joebobilly.appleattack.players.cutscenes.Cutscene
+import org.joebobilly.appleattack.utils.Sounds
 
 class AAPlayer(playerConnection: PlayerConnection, gameProfile: GameProfile) : Player(playerConnection, gameProfile) {
     val health = EntityHealth(this, this::maxHealth)
@@ -18,14 +19,15 @@ class AAPlayer(playerConnection: PlayerConnection, gameProfile: GameProfile) : P
             field = value
         }
     private var lastRegenTick = 0L
+    internal var currentCutscene: Cutscene? = null
 
     fun maxHealth(): Double = 20.0
 
     override fun kill() {
         health.healFull()
-        instance.playSound(AAMobType.defaultDeathSound, position)
+        instance.playSound(Sounds.GENERIC_DEATH, position)
         teleport(respawnPoint)
-        playSound(AAMobType.defaultDeathSound)
+        playSound(Sounds.GENERIC_DEATH)
     }
 
     override fun update(time: Long) {

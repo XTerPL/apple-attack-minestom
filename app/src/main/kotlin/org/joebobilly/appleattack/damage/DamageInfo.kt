@@ -2,7 +2,7 @@ package org.joebobilly.appleattack.damage
 
 import net.minestom.server.entity.Entity
 import net.minestom.server.entity.LivingEntity
-import org.joebobilly.appleattack.mobs.AAMob
+import org.joebobilly.appleattack.entities.mobs.AAMob
 import org.joebobilly.appleattack.players.AAPlayer
 
 class DamageInfo private constructor(val attackInfo: AttackInfo, val attacker: LivingEntity?, val source: Entity?, val attackStrength: Double) {

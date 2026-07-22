@@ -9,8 +9,7 @@ import net.minestom.server.command.builder.arguments.ArgumentType
 import net.minestom.server.coordinate.Vec
 import net.minestom.server.entity.Player
 import net.minestom.server.utils.location.RelativeVec
-import org.joebobilly.appleattack.content.mobs.AppleMob
-import org.joebobilly.appleattack.mobs.AAMobTypeManager
+import org.joebobilly.appleattack.entities.AAEntityTypeManager
 
 object SpawnCommand : Command("spawn", "summon") {
     init {
@@ -21,7 +20,7 @@ object SpawnCommand : Command("spawn", "summon") {
         val idArgument = ArgumentType.String("id")
         idArgument.suggestionCallback = {
             _, _, suggestion ->
-            AAMobTypeManager.getSuggestions(suggestion.input).forEach {
+            AAEntityTypeManager.getSuggestions(suggestion.input).forEach {
                 entry -> suggestion.addEntry(entry)
             }
         }
@@ -35,13 +34,13 @@ object SpawnCommand : Command("spawn", "summon") {
         addSyntax({ sender: CommandSender?, ctx: CommandContext ->
             if(sender is Player) {
                 val id = ctx.get(idArgument)
-                val mobType = AAMobTypeManager.get(id)
-                if(mobType == null) {
-                    sender.sendMessage(Component.text("$id is not a valid mob type!", NamedTextColor.RED))
+                val entityType = AAEntityTypeManager.get(id)
+                if(entityType == null) {
+                    sender.sendMessage(Component.text("$id is not a valid entity type!", NamedTextColor.RED))
                 }
                 else {
                     val position = ctx.get(positionArgument).from(sender)
-                    AppleMob.spawn(sender.instance, position.asPos())
+                    entityType.spawn(sender.instance, position.asPos())
                 }
             }
             else {

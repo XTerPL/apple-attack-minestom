@@ -1,4 +1,4 @@
-package org.joebobilly.appleattack.content.mobs
+package org.joebobilly.appleattack.content.entities.mobs
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -12,9 +12,9 @@ import net.minestom.server.entity.metadata.avatar.MannequinMeta
 import net.minestom.server.network.player.ResolvableProfile
 import org.joebobilly.appleattack.content.items.AppleItem
 import org.joebobilly.appleattack.damage.AttackInfo
-import org.joebobilly.appleattack.mobs.AAMob
-import org.joebobilly.appleattack.mobs.AAMobType
-import org.joebobilly.appleattack.mobs.HomeStrollGoal
+import org.joebobilly.appleattack.entities.mobs.AAMob
+import org.joebobilly.appleattack.entities.type.AAMobType
+import org.joebobilly.appleattack.entities.mobs.HomeStrollGoal
 import org.joebobilly.appleattack.rewards.LootTable
 import org.joebobilly.appleattack.rewards.Reward
 import org.joebobilly.appleattack.rewards.Reward.Companion.toLootTableEntry

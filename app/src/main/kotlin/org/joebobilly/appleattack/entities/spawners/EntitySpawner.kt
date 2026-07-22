@@ -1,4 +1,4 @@
-package org.joebobilly.appleattack.spawners
+package org.joebobilly.appleattack.entities.spawners
 
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Entity
@@ -60,6 +60,7 @@ sealed class EntitySpawner(val maxSpawned: Int = 1) {
         override fun read(reader: TagReadable): EntitySpawner {
             return when(val type = reader.getTagOrThrow(typeTag)) {
                 "mob" -> MobSpawner.Serializer.read(reader)
+                "npc" -> NPCSpawner.Serializer.read(reader)
                 else -> throw NBTReadError("", "Invalid entity spawner type: $type")
             }
         }
@@ -69,6 +70,10 @@ sealed class EntitySpawner(val maxSpawned: Int = 1) {
                 is MobSpawner -> {
                     MobSpawner.Serializer.write(writer, value)
                     "mob"
+                }
+                is NPCSpawner -> {
+                    NPCSpawner.Serializer.write(writer, value)
+                    "npc"
                 }
             })
         }

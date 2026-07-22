@@ -5,7 +5,7 @@ import net.minestom.server.event.entity.EntityAttackEvent
 import org.joebobilly.appleattack.damage.DamageInfo
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.ItemProperty
-import org.joebobilly.appleattack.mobs.AAMob
+import org.joebobilly.appleattack.entities.mobs.AAMob
 import org.joebobilly.appleattack.players.AAPlayer
 
 object DamageEvents {

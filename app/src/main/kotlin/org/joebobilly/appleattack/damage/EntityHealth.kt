@@ -10,9 +10,9 @@ import net.minestom.server.adventure.audience.Audiences
 import net.minestom.server.component.DataComponents
 import net.minestom.server.entity.LivingEntity
 import net.minestom.server.network.packet.server.play.DamageEventPacket
-import org.joebobilly.appleattack.mobs.AAMob
-import org.joebobilly.appleattack.mobs.AAMobType
+import org.joebobilly.appleattack.entities.mobs.AAMob
 import org.joebobilly.appleattack.players.AAPlayer
+import org.joebobilly.appleattack.utils.Sounds
 
 class EntityHealth(val entity: LivingEntity, val maxHealth: () -> Double) {
     private var health = maxHealth()
@@ -33,7 +33,7 @@ class EntityHealth(val entity: LivingEntity, val maxHealth: () -> Double) {
 
     private fun damageSound(): Sound {
         if(entity is AAMob) return entity.type.damageSound()
-        return AAMobType.defaultDamageSound
+        return Sounds.GENERIC_DEATH
     }
 
     private fun calculateDamage(damage: DamageInfo): Double {

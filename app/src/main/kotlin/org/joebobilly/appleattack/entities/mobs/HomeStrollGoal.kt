@@ -1,4 +1,4 @@
-package org.joebobilly.appleattack.mobs
+package org.joebobilly.appleattack.entities.mobs
 
 import net.minestom.server.coordinate.Vec
 import net.minestom.server.entity.EntityCreature

@@ -4,8 +4,8 @@ import net.minestom.server.event.GlobalEventHandler
 import net.minestom.server.event.instance.InstanceRegisterEvent
 import net.minestom.server.event.instance.InstanceUnregisterEvent
 import net.minestom.server.tag.Tag
-import org.joebobilly.appleattack.spawners.EntitySpawner
-import org.joebobilly.appleattack.spawners.SpawnerManager
+import org.joebobilly.appleattack.entities.spawners.EntitySpawner
+import org.joebobilly.appleattack.entities.spawners.SpawnerManager
 import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
 
 object InstanceEvents {

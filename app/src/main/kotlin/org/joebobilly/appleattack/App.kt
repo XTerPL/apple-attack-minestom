@@ -6,6 +6,7 @@ import net.minestom.server.MinecraftServer
 import net.minestom.server.ServerFlag
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
+import net.minestom.server.event.entity.EntityVelocityEvent
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.instance.anvil.AnvilLoader
@@ -21,19 +22,24 @@ import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.SpawnCommand
 import org.joebobilly.appleattack.commands.StopCommand
 import org.joebobilly.appleattack.content.items.Items
-import org.joebobilly.appleattack.content.mobs.AppleMob
+import org.joebobilly.appleattack.content.entities.mobs.AppleMob
+import org.joebobilly.appleattack.content.entities.mobs.Mobs
+import org.joebobilly.appleattack.content.entities.npcs.NPCs
+import org.joebobilly.appleattack.content.entities.npcs.TestNPC
 import org.joebobilly.appleattack.content.traits.Traits
+import org.joebobilly.appleattack.entities.AAEntityTypeManager
 import org.joebobilly.appleattack.events.DamageEvents
 import org.joebobilly.appleattack.events.InstanceEvents
 import org.joebobilly.appleattack.events.InventoryEvents
 import org.joebobilly.appleattack.events.ItemEvents
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.tools.traits.TraitManager
-import org.joebobilly.appleattack.mobs.AAMobTypeManager
+import org.joebobilly.appleattack.events.InteractEvents
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.players.PlayerSaveManager
-import org.joebobilly.appleattack.spawners.MobSpawner
-import org.joebobilly.appleattack.spawners.SpawnerManager
+import org.joebobilly.appleattack.entities.spawners.MobSpawner
+import org.joebobilly.appleattack.entities.spawners.NPCSpawner
+import org.joebobilly.appleattack.entities.spawners.SpawnerManager
 import java.nio.file.Path
 
 fun main() {
@@ -45,8 +51,9 @@ fun main() {
     Items.register()
     AAItemManager.freeze()
 
-    AAMobTypeManager.register(AppleMob)
-    AAMobTypeManager.freeze()
+    Mobs.register()
+    NPCs.register()
+    AAEntityTypeManager.freeze()
 
     Traits.register()
     TraitManager.freeze()
@@ -73,6 +80,7 @@ fun main() {
     ItemEvents.init(globalEventHandler)
     InventoryEvents.init(globalEventHandler)
     InstanceEvents.init(globalEventHandler)
+    InteractEvents.init(globalEventHandler)
 
     val instanceManager = MinecraftServer.getInstanceManager()
     val instance: InstanceContainer = instanceManager.createInstanceContainer()
@@ -91,23 +99,38 @@ fun main() {
             Pos(-24.5, 57.0, 83.5)
         )), instance
     )
+    SpawnerManager.registerSpawner(
+        NPCSpawner(TestNPC, Pos(-16.5, 57.0, 55.5)), instance
+    )
 
     val spawnPoint = Pos(-8.0, 57.0, 64.0)
 
-    globalEventHandler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
-        if(PlayerSaveManager.loadPlayer(event.player)) {
-            event.spawningInstance = instance
-            event.player.respawnPoint = spawnPoint
-            event.player.gameMode = GameMode.ADVENTURE
+    globalEventHandler.addListener(AsyncPlayerConfigurationEvent::class.java) {
+        if(PlayerSaveManager.loadPlayer(it.player)) {
+            it.spawningInstance = instance
+            it.player.respawnPoint = spawnPoint
+            it.player.gameMode = GameMode.ADVENTURE
         }
         else {
-            event.player.kick(Component.text("Failed to load your progress! (notify an admin)"))
+            it.player.kick(Component.text("Failed to load your progress! (notify an admin)"))
         }
     }
-    globalEventHandler.addListener(PlayerDisconnectEvent::class.java) { event ->
-        println("Player ${event.player.username} (${event.player.uuid}) disconnected!")
-        if(event.player.playerConnection.serverState == ConnectionState.PLAY) {
-            PlayerSaveManager.savePlayer(event.player)
+    globalEventHandler.addListener(PlayerDisconnectEvent::class.java) {
+        println("Player ${it.player.username} (${it.player.uuid}) disconnected!")
+        if(it.player.playerConnection.serverState == ConnectionState.PLAY) {
+            PlayerSaveManager.savePlayer(it.player)
+        }
+    }
+    globalEventHandler.addListener(EntityVelocityEvent::class.java) {
+        if(it.velocity.x().isNaN() || it.velocity.y().isNaN() || it.velocity.z().isNaN()) {
+            println("Invalid velocity set to ${it.entity.uuid}, found ${it.velocity}")
+            it.isCancelled = true
+            return@addListener
+        }
+        if(it.velocity.x().isInfinite() || it.velocity.y().isInfinite() || it.velocity.z().isInfinite()) {
+            println("Invalid velocity set to ${it.entity.uuid}, found ${it.velocity}")
+            it.isCancelled = true
+            return@addListener
         }
     }
 
