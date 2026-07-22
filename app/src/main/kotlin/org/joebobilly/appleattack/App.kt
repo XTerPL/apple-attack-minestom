@@ -41,6 +41,7 @@ import org.joebobilly.appleattack.entities.spawners.MobSpawner
 import org.joebobilly.appleattack.entities.spawners.NPCSpawner
 import org.joebobilly.appleattack.entities.spawners.SpawnerManager
 import java.nio.file.Path
+import java.util.logging.Logger
 
 fun main() {
     if(!ServerFlag.SERIALIZE_EMPTY_COMPOUND) {
@@ -121,14 +122,15 @@ fun main() {
             PlayerSaveManager.savePlayer(it.player)
         }
     }
+    val logger = Logger.getLogger("invalid-velocity-logging")
     globalEventHandler.addListener(EntityVelocityEvent::class.java) {
         if(it.velocity.x().isNaN() || it.velocity.y().isNaN() || it.velocity.z().isNaN()) {
-            println("Invalid velocity set to ${it.entity.uuid}, found ${it.velocity}")
+            logger.warning("Invalid velocity set to ${it.entity.uuid}, found ${it.velocity}")
             it.isCancelled = true
             return@addListener
         }
         if(it.velocity.x().isInfinite() || it.velocity.y().isInfinite() || it.velocity.z().isInfinite()) {
-            println("Invalid velocity set to ${it.entity.uuid}, found ${it.velocity}")
+            logger.warning("Invalid velocity set to ${it.entity.uuid}, found ${it.velocity}")
             it.isCancelled = true
             return@addListener
         }

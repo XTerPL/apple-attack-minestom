@@ -75,7 +75,11 @@ class EntityHealth(val entity: LivingEntity, val maxHealth: () -> Double) {
         // knockback
         val source = damage.source
         if(damage.attackInfo.knockback > 0 && source != null) {
-            val knockbackDir = source.position.asVec().sub(entity.position).mul(1.0, 0.0, 1.0).normalize()
+            var knockbackDir = source.position.asVec().sub(entity.position).mul(1.0, 0.0, 1.0)
+            if(knockbackDir.isZero) {
+                knockbackDir = source.position.direction().mul(1.0, 0.0, 1.0)
+            }
+            knockbackDir = knockbackDir.normalize()
             entity.takeKnockback(damage.attackInfo.knockback, knockbackDir.x, knockbackDir.z)
         }
 
