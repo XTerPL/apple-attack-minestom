@@ -1,6 +1,7 @@
 package org.joebobilly.appleattack.players.cutscenes
 
 import net.kyori.adventure.text.Component
+import org.joebobilly.appleattack.interfaces.UserInterface
 import org.joebobilly.appleattack.players.AAPlayer
 import java.time.Duration
 import java.time.temporal.TemporalUnit
@@ -34,6 +35,7 @@ class Cutscene {
     fun speak(text: String, emotion: Speaker.Emotion = Speaker.Emotion.NORMAL, wait: CutsceneCommand.Wait? = null)
         = addCommand(CutsceneCommand.Speak(Component.text(text), emotion, wait))
     fun setSpeaker(speaker: Speaker) = addCommand(CutsceneCommand.SetSpeaker(speaker))
+    fun openInterface(interfaceSupplier: () -> UserInterface) = addCommand(CutsceneCommand.OpenInterface(interfaceSupplier))
 
     fun processCommand() {
         check(state == State.ONGOING) { "The cutscene is not ongoing!" }

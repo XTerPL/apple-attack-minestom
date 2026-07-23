@@ -15,7 +15,7 @@ class ItemProperty<T, R> private constructor(
     val default: ((AAItem<*>?) -> T)? = null,
 ) {
     companion object {
-        val NAME = of<Component>("name") {
+        val NAME = of<Component, Component>("name", { it.colorIfAbsent(NamedTextColor.WHITE) }) {
             Component.text(it?.let { "Unknown Item: ${it.id}" } ?: "Invalid Item", NamedTextColor.DARK_RED)
         }
         val DESCRIPTION = of<List<String>>("description") { emptyList() }

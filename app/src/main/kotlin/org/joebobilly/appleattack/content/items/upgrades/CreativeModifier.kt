@@ -12,9 +12,6 @@ import org.joebobilly.appleattack.items.icons.ItemIcon
 
 object CreativeModifier : BasicAAItem("creative_modifier", backingMaterial = Material.GOLD_INGOT) {
     init {
-        ItemProperty.NAME.set {
-            Component.text("Creative Modifier", NamedTextColor.YELLOW)
-        }
         ItemProperty.DESCRIPTION.set {
             listOf("Gives an extra modifier, infinitely.")
         }
@@ -27,4 +24,5 @@ object CreativeModifier : BasicAAItem("creative_modifier", backingMaterial = Mat
             ForgeUpgradeData(Traits.CREATIVE, -1)
         }
     }
+    override fun defaultName() = Component.text("Creative Modifier", NamedTextColor.YELLOW)
 }

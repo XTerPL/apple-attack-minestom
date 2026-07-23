@@ -2,17 +2,19 @@ package org.joebobilly.appleattack.items
 
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextDecoration
 import net.minestom.server.component.DataComponents
 import net.minestom.server.item.ItemStack
 import net.minestom.server.item.Material
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
 import net.minestom.server.tag.TagSerializer
+import org.joebobilly.appleattack.utils.InventoryUtils
 
-abstract class AAItem<METATYPE>(val id: String,
-                                private val metaSerializer: TagSerializer<METATYPE>,
-                                val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK) {
+abstract class AAItem<METATYPE>(
+    val id: String,
+    private val metaSerializer: TagSerializer<METATYPE>,
+    val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK
+) {
     companion object {
         internal val idTag = Tag.String("id")
         internal val itemTag = idTag.map<AAItem<*>>(AAItemManager::get, AAItem<*>::id)
@@ -25,6 +27,9 @@ abstract class AAItem<METATYPE>(val id: String,
         require(maxCount in 1..99) { "maxCount must be between 1 and 99, got $maxCount" }
         require(backingMaterial != Material.AIR) { "backingMaterial must not be 'AIR'" }
         AAItemManager.throwIfFrozen { "Cannot create item type $id after server startup (did you forget to register this type?)" }
+        ItemProperty.NAME.set {
+            defaultName()
+        }
     }
 
     // creation
@@ -107,14 +112,15 @@ abstract class AAItem<METATYPE>(val id: String,
         return null
     }
 
-    private fun lore(meta: METATYPE): List<Component> {
+    abstract fun defaultName(): Component
+    fun lore(meta: METATYPE): List<Component> {
         val lore = mutableListOf<Component>()
 
         for(entry in LoreProvider.PROPERTY_PROVIDES_LORE) {
             lore.addAll(entry.getLore(this, meta))
         }
 
-        return lore.map { line -> line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
+        return InventoryUtils.sanitizeLore(lore)
     }
     protected open fun update(builder: ItemStack.Builder, meta: METATYPE) {
         builder.set(DataComponents.ITEM_NAME, getProperty(ItemProperty.NAME, meta)).lore(lore(meta)).hideExtraTooltip()

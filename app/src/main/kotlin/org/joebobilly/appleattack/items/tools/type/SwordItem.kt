@@ -1,5 +1,6 @@
 package org.joebobilly.appleattack.items.tools.type
 
+import net.kyori.adventure.text.Component
 import net.minestom.server.tag.TagReadable
 import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
@@ -30,6 +31,8 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSeria
                 builder.addMaterial(it)
             }
         }
+
+        override fun defaultName() = Component.text("Forged Sword")
     }
 
     data class Recipe(

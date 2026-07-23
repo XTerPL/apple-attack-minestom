@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.minestom.server.MinecraftServer
 import net.minestom.server.timer.TaskSchedule
 import net.minestom.server.utils.time.TimeUnit
+import org.joebobilly.appleattack.interfaces.UserInterface
 import java.time.Duration
 import java.time.temporal.TemporalUnit
 
@@ -38,6 +39,12 @@ interface CutsceneCommand {
     class SetSpeaker(val newSpeaker: Speaker) : CutsceneCommand {
         override fun execute(cutscene: Cutscene): Cutscene.Directive {
             cutscene.currentSpeaker = newSpeaker
+            return Cutscene.Directive.STEP
+        }
+    }
+    class OpenInterface(val interfaceSupplier: () -> UserInterface) : CutsceneCommand {
+        override fun execute(cutscene: Cutscene): Cutscene.Directive {
+            cutscene.getPlayer().openInventory(interfaceSupplier().inventory)
             return Cutscene.Directive.STEP
         }
     }

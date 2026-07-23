@@ -9,9 +9,6 @@ import org.joebobilly.appleattack.items.icons.PlayerHeadIcon
 
 object AppleItem : BasicAAItem("apple", backingMaterial = Material.APPLE) {
     init {
-        ItemProperty.NAME.set {
-            Component.text("Apple", NamedTextColor.RED)
-        }
         ItemProperty.DESCRIPTION.set {
             listOf("An apple.")
         }
@@ -21,4 +18,5 @@ object AppleItem : BasicAAItem("apple", backingMaterial = Material.APPLE) {
             )
         }
     }
+    override fun defaultName() = Component.text("Apple", NamedTextColor.RED)
 }

@@ -16,7 +16,7 @@ import org.joebobilly.appleattack.items.tools.type.ToolItem
 import org.joebobilly.appleattack.utils.AreaUtils
 import org.joebobilly.appleattack.utils.Sounds
 
-class StationInterface : UserInterface(InventoryType.CHEST_5_ROW, Component.text("Station of Upgrading")) {
+class StationInterface : UserInterface(InventoryType.CHEST_5_ROW, "Station of Upgrading") {
     companion object {
         private fun slotCover(material: Material, name: String, description: List<String>): ItemStack {
             return ItemStack.builder(material).set(DataComponents.ITEM_NAME, Component.text(name))

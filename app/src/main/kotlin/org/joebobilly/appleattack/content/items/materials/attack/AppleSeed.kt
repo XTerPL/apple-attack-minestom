@@ -10,9 +10,6 @@ import org.joebobilly.appleattack.items.icons.ItemIcon
 
 object AppleSeed : BasicAAItem("apple_seed", backingMaterial = Material.INK_SAC) {
     init {
-        ItemProperty.NAME.set {
-            Component.text("Apple Seed", NamedTextColor.DARK_GRAY)
-        }
         ItemProperty.DESCRIPTION.set {
             listOf("And you're gonna use it", "to make a weapon, sure.")
         }
@@ -26,4 +23,5 @@ object AppleSeed : BasicAAItem("apple_seed", backingMaterial = Material.INK_SAC)
             )
         }
     }
+    override fun defaultName() = Component.text("Apple Seed", NamedTextColor.DARK_GRAY)
 }

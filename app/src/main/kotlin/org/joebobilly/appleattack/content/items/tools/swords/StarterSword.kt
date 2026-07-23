@@ -12,12 +12,12 @@ import org.joebobilly.appleattack.items.icons.ItemIcon
 
 object StarterSword : SwordItem.Defined("starter_sword") {
     init {
-        ItemProperty.NAME.set { Component.text("Starter Sword", NamedTextColor.GOLD) }
         ItemProperty.ICON.set { ItemIcon(Material.WOODEN_SWORD) }
         ItemProperty.DESCRIPTION.set {
             listOf("Your first weapon.")
         }
     }
+    override fun defaultName() = Component.text("Starter Sword", NamedTextColor.GOLD)
 
     override fun defineTool(
         meta: ToolMeta,

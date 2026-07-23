@@ -12,4 +12,6 @@ object Sounds {
     val GENERIC_HURT = Sound.sound(Key.key("entity.generic.hurt"), Sound.Source.HOSTILE, 1f, 1f)
     val GENERIC_DEATH = Sound.sound(Key.key("entity.generic.death"), Sound.Source.HOSTILE, 1f, 1f)
     val GENERIC_TALK = Sound.sound(Key.key("minecraft:entity.villager.ambient"), Sound.Source.NEUTRAL, 1f, 1.5f)
+    val GENERIC_PURCHASE = Sound.sound(Key.key("minecraft:entity.villager.yes"), Sound.Source.NEUTRAL, 1f, 1.5f)
+    val GENERIC_REFUSE = Sound.sound(Key.key("minecraft:entity.villager.no"), Sound.Source.NEUTRAL, 1f, 1.5f)
 }

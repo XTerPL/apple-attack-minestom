@@ -1,13 +1,20 @@
 package org.joebobilly.appleattack.rewards
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.minestom.server.component.DataComponents
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Entity
 import net.minestom.server.entity.ItemEntity
+import net.minestom.server.entity.PlayerSkin
 import net.minestom.server.instance.Instance
 import net.minestom.server.inventory.TransactionOption
 import net.minestom.server.item.ItemStack
+import net.minestom.server.item.Material
+import net.minestom.server.network.player.ResolvableProfile
 import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.BasicAAItem
+import org.joebobilly.appleattack.items.ItemProperty
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.utils.RandomUtils.nextVec2
 import java.time.Duration
@@ -32,6 +39,9 @@ sealed interface Reward {
             }
             return entities
         }
+
+        const val CRATE_HEAD_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGY4ZDY5NWFlMDVmNmM5MjdjMzVlYzU5NDc0YmEzOTEzYzQ5NmUyNTU0M2JmNThjMjIxMmMyODQ0ZWY2ZTQwIn19fQ=="
+        val CRATE_PROFILE = ResolvableProfile(PlayerSkin(CRATE_HEAD_TEXTURE, null))
     }
 
     class Item<METATYPE> private constructor(
@@ -51,15 +61,11 @@ sealed interface Reward {
         override fun multiply(multiplier: Double): Item<METATYPE> {
             return Item(type, meta, (count * multiplier).toInt())
         }
-        override fun grant(player: AAPlayer, dry: Boolean): Boolean {
+        override fun grant(player: AAPlayer) {
             val items = getItems()
-            if(player.inventory.addItemStacks(items, TransactionOption.DRY_RUN).contains(false)) {
-                return false
+            for(item in player.inventory.addItemStacks(items, TransactionOption.ALL)) {
+                player.dropItem(item)
             }
-            if(!dry) {
-                player.inventory.addItemStacks(items, TransactionOption.ALL_OR_NOTHING)
-            }
-            return true
         }
         override fun createEntities(): List<Entity> {
             val items = getItems()
@@ -67,25 +73,40 @@ sealed interface Reward {
                 this.setPickupDelay(Duration.ofSeconds(1))
             } }
         }
+        override fun getIcon(): ItemStack {
+            if(count > type.maxCount) {
+                val name = Component.empty()
+                    .append(Component.text("${count}x ", NamedTextColor.GRAY))
+                    .append(type.getProperty(ItemProperty.NAME, meta))
+                val lore = type.lore(meta)
+
+                return ItemStack.builder(Material.PLAYER_HEAD)
+                    .set(DataComponents.PROFILE, CRATE_PROFILE)
+                    .set(DataComponents.ITEM_NAME, name)
+                    .lore(lore).build()
+            }
+            return type.create(count, meta)
+        }
 
         private fun getItems(): List<ItemStack> {
-            val stacks = count / type.maxCount
-            val remainder = count % type.maxCount
             val items = mutableListOf<ItemStack>()
-            if(stacks > 0) {
+            var count = count
+            if(count > type.maxCount) {
                 val itemStack = type.create(type.maxCount, meta)
-                (0..stacks).forEach { _ ->
+                while(count > type.maxCount) {
                     items.add(itemStack)
+                    count -= type.maxCount
                 }
             }
-            if(remainder > 0) {
-                items.add(type.create(remainder, meta))
+            if(count > 0) {
+                items.add(type.create(count, meta))
             }
             return items
         }
     }
 
     fun multiply(multiplier: Double): Reward
-    fun grant(player: AAPlayer, dry: Boolean = false): Boolean
+    fun grant(player: AAPlayer)
     fun createEntities(): List<Entity>
+    fun getIcon(): ItemStack
 }

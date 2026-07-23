@@ -33,6 +33,8 @@ abstract class UserInterface(val inventoryType: InventoryType, val title: Compon
         }
     }
 
+    constructor(inventoryType: InventoryType, title: String) : this(inventoryType, Component.text(title))
+
     val dimensions = InventoryUtils.getDimensions(inventoryType)
         ?: throw IllegalArgumentException("Unsupported Inventory Type: $inventoryType")
     private val _inventory = Suppliers.memoize { UserInterfaceInventory(this) }
@@ -56,7 +58,7 @@ abstract class UserInterface(val inventoryType: InventoryType, val title: Compon
             }
         }
         player.inventory.addItemStacks(items, TransactionOption.ALL).forEach {
-            if(!it.isAir) player.dropItem(it)
+            player.dropItem(it)
         }
     }
 }

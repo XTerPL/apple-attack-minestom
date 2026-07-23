@@ -9,9 +9,6 @@ import org.joebobilly.appleattack.items.tools.ForgeMaterial
 
 object AppleStick : BasicAAItem("apple_stick", backingMaterial = Material.STICK) {
     init {
-        ItemProperty.NAME.set {
-            Component.text("Apple Stick", NamedTextColor.GOLD)
-        }
         ItemProperty.DESCRIPTION.set {
             listOf("The stem of an apple, I guess?")
         }
@@ -19,4 +16,5 @@ object AppleStick : BasicAAItem("apple_stick", backingMaterial = Material.STICK)
             ForgeMaterial.Handle(ForgeMaterial.Definition(0, emptyMap()))
         }
     }
+    override fun defaultName() = Component.text("Apple Stick", NamedTextColor.GOLD)
 }

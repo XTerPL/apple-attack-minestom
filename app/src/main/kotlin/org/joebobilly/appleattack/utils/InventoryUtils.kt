@@ -1,5 +1,8 @@
 package org.joebobilly.appleattack.utils
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.minestom.server.entity.Player
 import net.minestom.server.inventory.InventoryType
 import net.minestom.server.item.ItemStack
@@ -46,5 +49,24 @@ object InventoryUtils {
             }
         }
         return itemStack
+    }
+    fun takeUsingMap(player: Player, takenItemMap: Map<Int, Int>) {
+        for(takenEntry in takenItemMap) {
+            val slot = takenEntry.key
+            val amount = takenEntry.value
+            val itemStack = player.inventory.getItemStack(slot)
+            player.inventory.setItemStack(slot, itemStack.consume(amount))
+        }
+    }
+    fun sanitizeLore(lore: List<Component>): List<Component> {
+        if(lore.size > 256) {
+            val newLore = mutableListOf<Component>()
+            for(i in 0..<255) {
+                newLore.add(lore[i])
+            }
+            newLore.add(Component.text("-- lore cutoff --", NamedTextColor.DARK_GRAY))
+            return sanitizeLore(newLore)
+        }
+        return lore.map { line -> line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
     }
 }

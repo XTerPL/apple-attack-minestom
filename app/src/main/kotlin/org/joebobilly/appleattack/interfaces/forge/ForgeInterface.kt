@@ -1,6 +1,5 @@
 package org.joebobilly.appleattack.interfaces.forge
 
-import net.kyori.adventure.text.Component
 import net.minestom.server.entity.Player
 import net.minestom.server.inventory.InventoryType
 import net.minestom.server.item.ItemStack
@@ -15,7 +14,7 @@ import org.joebobilly.appleattack.items.tools.type.ToolType
 import org.joebobilly.appleattack.utils.AreaUtils
 import org.joebobilly.appleattack.utils.Sounds
 
-abstract class ForgeInterface(toolType: ToolType) : UserInterface(InventoryType.CHEST_5_ROW, Component.text("Forge of Creation: ${toolType.displayName}")) {
+abstract class ForgeInterface(toolType: ToolType) : UserInterface(InventoryType.CHEST_5_ROW, "Forge of Creation: ${toolType.displayName}") {
     companion object {
         fun forgeMaterialSlot(type: ForgeMaterialType): Slot.Input {
             return Slot.Input(type.getSlotCover()) { item ->
