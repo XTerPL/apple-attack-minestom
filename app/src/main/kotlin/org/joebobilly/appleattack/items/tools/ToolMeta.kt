@@ -1,10 +1,10 @@
 package org.joebobilly.appleattack.items.tools
 
 import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.ItemProperty
+import org.joebobilly.appleattack.utils.TagCopySerializer
 
 open class ToolMeta {
     private val upgradeItems = mutableListOf<AAItemMetaPair<*>>()
@@ -23,6 +23,10 @@ open class ToolMeta {
         return upgradeItems.removeLastOrNull()
     }
 
+    fun clearUpgrades() {
+        upgradeItems.clear()
+    }
+
     fun <RECIPE : ForgedToolMeta.Recipe> withRecipe(recipe: RECIPE): ForgedToolMeta<RECIPE> {
         val meta = ForgedToolMeta(recipe)
         upgradeItems.forEach {
@@ -31,7 +35,7 @@ open class ToolMeta {
         return meta
     }
 
-    object Serializer : TagSerializer<ToolMeta> {
+    object Serializer : TagCopySerializer<ToolMeta> {
         private val upgradeItems = AAItemMetaPair.tag("upgrades").list().defaultValue(emptyList())
 
         override fun read(reader: TagReadable): ToolMeta {
@@ -43,6 +47,14 @@ open class ToolMeta {
 
         override fun write(writer: TagWritable, value: ToolMeta) {
             writer.setTag(upgradeItems, value.upgradeItems)
+        }
+
+        override fun copy(value: ToolMeta): ToolMeta {
+            val meta = ToolMeta()
+            value.upgradeItems.forEach {
+                meta.addUpgrade(it)
+            }
+            return meta
         }
     }
 }

@@ -2,7 +2,6 @@ package org.joebobilly.appleattack.items.tools.type
 
 import net.kyori.adventure.text.Component
 import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.items.AAItemMetaPair
@@ -11,9 +10,10 @@ import org.joebobilly.appleattack.items.tools.ForgeMaterial
 import org.joebobilly.appleattack.items.tools.ForgedToolMeta
 import org.joebobilly.appleattack.items.tools.ToolMeta
 import org.joebobilly.appleattack.items.tools.ToolStat
+import org.joebobilly.appleattack.utils.TagCopySerializer
 import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 
-sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSerializer<METATYPE>)
+sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagCopySerializer<METATYPE>)
     : ToolItem<METATYPE>(id, ToolType.SWORD, metaSerializer) {
     abstract class Defined(id: String) : SwordItem<ToolMeta>(id, ToolMeta.Serializer)
     object Forged : SwordItem<ForgedToolMeta<Recipe>>("forged_sword",
@@ -50,7 +50,7 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSeria
             return bladeDown
         }
 
-        object Serializer : TagSerializer<Recipe> {
+        object Serializer : TagCopySerializer<Recipe> {
             val handle = AAItemMetaPair.tag("handle")
             val bladeDown = AAItemMetaPair.tag("blade_down")
             val bladeUp = AAItemMetaPair.tag("blade_up")
@@ -67,6 +67,10 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagSeria
                 writer.setTag(handle, value.handle)
                 writer.setTag(bladeDown, value.bladeDown)
                 writer.setTag(bladeUp, value.bladeUp)
+            }
+
+            override fun copy(value: Recipe): Recipe {
+                return value.copy()
             }
         }
     }

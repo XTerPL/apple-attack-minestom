@@ -6,53 +6,46 @@ import net.minestom.server.item.ItemStack
 import net.minestom.server.item.Material
 import org.joebobilly.appleattack.interfaces.Slot
 import org.joebobilly.appleattack.interfaces.UserInterface
+import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.AAItemManager
-import org.joebobilly.appleattack.items.ItemProperty
+import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.tools.ToolMeta
-import org.joebobilly.appleattack.items.tools.type.ToolItem
+import org.joebobilly.appleattack.items.tools.reinforcement.Reinforcement
+import org.joebobilly.appleattack.rewards.Cost
 import org.joebobilly.appleattack.utils.AreaUtils
 import org.joebobilly.appleattack.utils.InventoryUtils
 import org.joebobilly.appleattack.utils.Sounds
 
-class StationInterface : UserInterface(InventoryType.CHEST_5_ROW, "Station of Upgrading") {
+class ReinforcementInterface(val reinforcement: Reinforcement)
+    : UserInterface(InventoryType.CHEST_5_ROW, reinforcement.inventoryName()) {
     companion object {
-        private val highlightRectangle = Pair(Pair(0, 1), Pair(2, 3))
-        private val highlightRectangle2 = Pair(Pair(6, 1), Pair(8, 3))
-        private val highlightConnector = Pair(Pair(3, 2), Pair(5, 2))
+        private val highlightRectangle = Pair(Pair(1, 1), Pair(3, 3))
+        private val highlightRectangle2 = Pair(Pair(5, 1), Pair(7, 3))
+        private val reinforcementIconPoint = Pair(4, 2)
     }
 
     private val toolSlot = Slot.Input(InventoryUtils.icon(
         Material.WHITE_STAINED_GLASS_PANE, "Tool/Armor Slot",
         listOf("Put tools and armor here!", "The mechanical limbs of the player.")
-    )) { AAItemManager.getItem(it) is ToolItem<*> }
-    private val upgradeSlot = Slot.Storage(InventoryUtils.icon(
-        Material.LIGHT_BLUE_STAINED_GLASS_PANE, "Upgrade Slot",
-        listOf("Put upgrades here!", "Can also be called modifier items.")
-    )) { AAItemManager.hasItemProperty(it, ItemProperty.FORGE_UPGRADE_DATA) }
+    )) {
+        itemStack -> AAItemManager.getItemMetaPair(itemStack)?.let { tryReinforce(it) } != null
+    }
     private val resultSlot = object : Slot.Output() {
         override fun getResult(): ItemStack {
-            val toolType = AAItemManager.getItem(toolSlot.itemStack)
-            if(toolType is ToolItem<*>) {
-                return upgradeTool(toolType)
-            }
-            return ItemStack.AIR
+            return AAItemManager.getItemMetaPair(toolSlot.itemStack)?.let { tryReinforce(it) }?.first?.create()
+                ?: ItemStack.AIR
         }
 
-        private fun <T : ToolMeta> upgradeTool(toolType: ToolItem<T>): ItemStack {
-            val meta = toolType.getMeta(toolSlot.itemStack) ?: return ItemStack.AIR
-            if(!toolType.safelyAddUpgradeToMeta(meta, upgradeSlot.getItemMetaPair() ?: return ItemStack.AIR)) {
-                return ItemStack.AIR
-            }
-            return toolType.create(meta)
+        override fun getCost(): Cost {
+            return AAItemManager.getItemMetaPair(toolSlot.itemStack)?.let { tryReinforce(it) }?.second ?: Cost.free()
         }
 
         override fun onSuccess(player: Player) {
             toolSlot.itemStack = ItemStack.AIR
-            upgradeSlot.takeOne()
         }
 
         override fun onOverallSuccess(player: Player) {
-            player.playSound(Sounds.UPGRADE_SUCCEED)
+            player.playSound(Sounds.REINFORCE_SUCCEED)
         }
 
         override fun canSwapHands(player: Player): Boolean {
@@ -65,9 +58,8 @@ class StationInterface : UserInterface(InventoryType.CHEST_5_ROW, "Station of Up
     }
 
     override fun defineSlots(definer: SlotDefiner) {
-        definer.setSlot(1, 2, toolSlot)
-        definer.setSlot(4, 2, upgradeSlot)
-        definer.setSlot(7, 2, resultSlot)
+        definer.setSlot(2, 2, toolSlot)
+        definer.setSlot(6, 2, resultSlot)
     }
 
     override fun getBackgroundIcon(x: Int, y: Int): ItemStack {
@@ -77,9 +69,21 @@ class StationInterface : UserInterface(InventoryType.CHEST_5_ROW, "Station of Up
             return backgroundIcon.withMaterial(Material.BLACK_STAINED_GLASS_PANE)
         if(AreaUtils.withinRectangle(point, highlightRectangle2))
             return backgroundIcon.withMaterial(Material.BLACK_STAINED_GLASS_PANE)
-        if(AreaUtils.withinRectangle(point, highlightConnector))
-            return backgroundIcon.withMaterial(Material.BLACK_STAINED_GLASS_PANE)
+        if(AreaUtils.exactPoint(point, reinforcementIconPoint))
+            return reinforcement.icon()
 
         return backgroundIcon
+    }
+
+    private fun <METATYPE> tryReinforce(itemMetaPair: AAItemMetaPair<METATYPE>): Pair<AAItemMetaPair<*>, Cost>? {
+        val meta = itemMetaPair.meta
+        if(meta is ToolMeta) {
+            @Suppress("UNCHECKED_CAST")
+            return reinforcement.reinforce(AAItemMetaPair(
+                itemMetaPair.itemType as AAItem<ToolMeta>, meta
+            ))
+        }
+
+        return null
     }
 }

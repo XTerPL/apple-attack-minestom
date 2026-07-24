@@ -13,8 +13,10 @@ import org.joebobilly.appleattack.content.items.tools.swords.StarterSword
 import org.joebobilly.appleattack.entities.npcs.NPC
 import org.joebobilly.appleattack.entities.type.NPCType
 import org.joebobilly.appleattack.interfaces.UserInterface
+import org.joebobilly.appleattack.interfaces.forge.ReinforcementSlot
 import org.joebobilly.appleattack.interfaces.shop.ShopSlot
 import org.joebobilly.appleattack.items.tools.ToolMeta
+import org.joebobilly.appleattack.items.tools.reinforcement.ClearAllUpgradesReinforcement
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.players.cutscenes.Cutscene
 import org.joebobilly.appleattack.rewards.Cost
@@ -43,6 +45,7 @@ object TestNPC : NPCType("test_npc", EntityType.VILLAGER) {
         cutscene.openInterface { object : UserInterface(InventoryType.CHEST_3_ROW, "Test NPC") {
             override fun defineSlots(definer: SlotDefiner) {
                 definer.setSlot(4, 1, ShopSlot(starterSwordWare))
+                definer.setSlot(2, 1, ReinforcementSlot(ClearAllUpgradesReinforcement))
             }
         } }
     }

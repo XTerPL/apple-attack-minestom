@@ -2,6 +2,7 @@ package org.joebobilly.appleattack.rewards
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minestom.server.component.DataComponents
 import net.minestom.server.item.ItemStack
 import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.predicates.ItemPredicate
@@ -12,6 +13,10 @@ import org.joebobilly.appleattack.rewards.Currency.Companion.toCost
 import org.joebobilly.appleattack.utils.InventoryUtils
 
 class Cost internal constructor(val itemCosts: List<ItemCost>, val currencyCosts: List<CurrencyCost<*>>) {
+    companion object {
+        fun free(): Cost = Builder().build()
+    }
+
     class Builder {
         private val itemCosts = mutableListOf<ItemCost>()
         private val currencyCosts = mutableMapOf<Currency<*>, CurrencyCost<*>>()
@@ -65,6 +70,9 @@ class Cost internal constructor(val itemCosts: List<ItemCost>, val currencyCosts
         }
     }
 
+    fun isFree(): Boolean {
+        return itemCosts.isEmpty() && currencyCosts.isEmpty()
+    }
     fun has(player: AAPlayer): Boolean {
         if(currencyCosts.any { !it.has(player) }) return false
         return getTakenItemMap(player) != null
@@ -78,7 +86,7 @@ class Cost internal constructor(val itemCosts: List<ItemCost>, val currencyCosts
     }
     fun getLore(): List<Component> {
         val costLore = mutableListOf<Component>()
-        if(currencyCosts.isEmpty() && itemCosts.isEmpty()) {
+        if(isFree()) {
             costLore.add(Component.text("Free", NamedTextColor.GREEN))
         }
         else {
@@ -88,6 +96,19 @@ class Cost internal constructor(val itemCosts: List<ItemCost>, val currencyCosts
         val lore = mutableListOf(Component.text("Costs: ", NamedTextColor.GRAY))
         lore.addAll(costLore.map { Component.space().append(it) })
         return lore.toList()
+    }
+    fun addCostLore(itemStack: ItemStack, includeFree: Boolean): ItemStack {
+        if(!includeFree && isFree()) {
+            return itemStack
+        }
+        val lore = itemStack.get(DataComponents.LORE)
+        val newLore = mutableListOf<Component>()
+        newLore.addAll(getLore())
+        if(!lore.isNullOrEmpty()) {
+            newLore.add(Component.text("│", NamedTextColor.DARK_GRAY))
+            newLore.addAll(lore)
+        }
+        return itemStack.withLore(InventoryUtils.sanitizeLore(newLore))
     }
     private fun getTakenItemMap(player: AAPlayer): Map<Int, Int>? {
         val takenItemMap = mutableMapOf<Int, Int>()

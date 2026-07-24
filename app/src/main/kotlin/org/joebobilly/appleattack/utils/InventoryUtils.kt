@@ -3,9 +3,12 @@ package org.joebobilly.appleattack.utils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.minestom.server.component.DataComponents
 import net.minestom.server.entity.Player
 import net.minestom.server.inventory.InventoryType
 import net.minestom.server.item.ItemStack
+import net.minestom.server.item.Material
+import org.joebobilly.appleattack.items.LoreProvider
 
 object InventoryUtils {
     fun getDimensions(inventoryType: InventoryType): Pair<Int, Int>? {
@@ -68,5 +71,12 @@ object InventoryUtils {
             return sanitizeLore(newLore)
         }
         return lore.map { line -> line.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
+    }
+    fun icon(material: Material, name: Component, description: List<String>): ItemStack {
+        return ItemStack.builder(material).set(DataComponents.ITEM_NAME, name)
+            .lore(LoreProvider.formatDescription(description)).build()
+    }
+    fun icon(material: Material, name: String, description: List<String>): ItemStack {
+        return icon(material, Component.text(name), description)
     }
 }

@@ -23,4 +23,7 @@ object AreaUtils {
     fun withinRectangle(point: Pair<Int, Int>, rectangle: Pair<Pair<Int, Int>, Pair<Int, Int>>): Boolean {
         return withinRectangle(point, rectangle.first, rectangle.second)
     }
+    fun exactPoint(pointA: Pair<Int, Int>, pointB: Pair<Int, Int>): Boolean {
+        return pointA.first == pointB.first && pointA.second == pointB.second
+    }
 }

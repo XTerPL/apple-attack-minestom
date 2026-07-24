@@ -2,7 +2,6 @@ package org.joebobilly.appleattack.items.tools.type
 
 import net.minestom.server.item.ItemStack
 import net.minestom.server.item.Material
-import net.minestom.server.tag.TagSerializer
 import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.AAItemMetaPair
@@ -12,8 +11,9 @@ import org.joebobilly.appleattack.items.tools.ForgeMaterial
 import org.joebobilly.appleattack.items.tools.ForgedToolMeta
 import org.joebobilly.appleattack.items.tools.ToolMeta
 import org.joebobilly.appleattack.items.icons.ItemIcon
+import org.joebobilly.appleattack.utils.TagCopySerializer
 
-sealed class ToolItem<METATYPE : ToolMeta>(id: String, val toolType: ToolType, metaSerializer: TagSerializer<METATYPE>)
+sealed class ToolItem<METATYPE : ToolMeta>(id: String, val toolType: ToolType, metaSerializer: TagCopySerializer<METATYPE>)
     : AAItem<METATYPE>(id, metaSerializer, 1) {
     init {
         ItemProperty.TOOL_DATA.set {

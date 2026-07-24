@@ -7,13 +7,16 @@ import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.CommandContext
 import net.minestom.server.command.builder.arguments.ArgumentType
 import net.minestom.server.entity.Player
+import org.joebobilly.appleattack.interfaces.forge.ReinforcementInterface
 import org.joebobilly.appleattack.interfaces.forge.StationInterface
 import org.joebobilly.appleattack.interfaces.forge.SwordForgeInterface
+import org.joebobilly.appleattack.items.tools.reinforcement.ClearAllUpgradesReinforcement
 
 object ForgeCommand : Command("forge") {
     private val subcommands = mapOf(
         Pair("station") { StationInterface() },
-        Pair("sword") { SwordForgeInterface() }
+        Pair("sword") { SwordForgeInterface() },
+        Pair("clear_upgrades") { ReinforcementInterface(ClearAllUpgradesReinforcement) }
     )
 
     init {

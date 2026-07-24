@@ -2,10 +2,10 @@ package org.joebobilly.appleattack.items.tools
 
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.ItemProperty
+import org.joebobilly.appleattack.utils.TagCopySerializer
 import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 
 class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolMeta() {
@@ -38,7 +38,7 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
         return recipe.getCoreMaterial().getProperty(ItemProperty.FORGE_MATERIAL)
     }
 
-    class Serializer<RECIPE : Recipe>(recipeSerializer: TagSerializer<RECIPE>) : TagSerializer<ForgedToolMeta<RECIPE>> {
+    class Serializer<RECIPE : Recipe>(private val recipeSerializer: TagCopySerializer<RECIPE>) : TagCopySerializer<ForgedToolMeta<RECIPE>> {
         private val recipe = Tag.Structure("recipe", recipeSerializer)
 
         override fun read(reader: TagReadable): ForgedToolMeta<RECIPE> {
@@ -49,6 +49,11 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
         override fun write(writer: TagWritable, value: ForgedToolMeta<RECIPE>) {
             writer.setTag(recipe, value.recipe)
             ToolMeta.Serializer.write(writer, value)
+        }
+
+        override fun copy(value: ForgedToolMeta<RECIPE>): ForgedToolMeta<RECIPE> {
+            val meta = ToolMeta.Serializer.copy(value)
+            return meta.withRecipe(recipeSerializer.copy(value.recipe))
         }
     }
 }

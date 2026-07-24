@@ -7,12 +7,12 @@ import net.minestom.server.item.ItemStack
 import net.minestom.server.item.Material
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
-import net.minestom.server.tag.TagSerializer
 import org.joebobilly.appleattack.utils.InventoryUtils
+import org.joebobilly.appleattack.utils.TagCopySerializer
 
 abstract class AAItem<METATYPE>(
     val id: String,
-    private val metaSerializer: TagSerializer<METATYPE>,
+    private val metaSerializer: TagCopySerializer<METATYPE>,
     val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK
 ) {
     companion object {
@@ -67,6 +67,9 @@ abstract class AAItem<METATYPE>(
     // serialization
     fun deserializeMeta(nbt: CompoundBinaryTag): METATYPE? {
         return metaSerializer.read(TagHandler.fromCompound(nbt))
+    }
+    internal fun copyMeta(meta: METATYPE): METATYPE {
+        return metaSerializer.copy(meta)
     }
 
     // item definition

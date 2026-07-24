@@ -11,6 +11,8 @@ import net.minestom.server.item.Material
 import org.joebobilly.appleattack.events.InventoryEvents
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.AAItemMetaPair
+import org.joebobilly.appleattack.players.AAPlayer
+import org.joebobilly.appleattack.rewards.Cost
 import org.joebobilly.appleattack.utils.InventoryUtils
 import org.joebobilly.appleattack.utils.Sounds
 
@@ -226,19 +228,21 @@ sealed interface Slot {
     abstract class Output : Slot {
         final override fun getIcon(): ItemStack {
             val icon = getResult()
-            if(!icon.isAir) return icon
+            if(!icon.isAir) return getCost().addCostLore(icon, false)
             return getNoResult()
         }
 
         final override fun handleClick(click: Click, clickInfo: InventoryEvents.ClickInfo) {
+            if(clickInfo.player !is AAPlayer) return
             val result = getResult()
+            val cost = getCost()
             if(result.isAir) {
                 onFailure(clickInfo.player)
                 return
             }
             if(click is Click.Left || click is Click.LeftDropCursor
                 || click is Click.Right || click is Click.RightDropCursor) {
-                if(clickInfo.cursor.isSimilar(result)) {
+                if(clickInfo.cursor.isSimilar(result) && cost.take(clickInfo.player)) {
                     val newCount = clickInfo.cursor.amount() + result.amount()
                     if(newCount < clickInfo.cursor.maxStackSize()) {
                         clickInfo.cursor = clickInfo.cursor.consume(-newCount)
@@ -249,7 +253,7 @@ sealed interface Slot {
                         onFailure(clickInfo.player)
                     }
                 }
-                else if(clickInfo.cursor.isAir) {
+                else if(clickInfo.cursor.isAir && cost.take(clickInfo.player)) {
                     clickInfo.cursor = result
                     onSuccess(clickInfo.player)
                     onOverallSuccess(clickInfo.player)
@@ -260,7 +264,7 @@ sealed interface Slot {
                 return
             }
             if(click is Click.HotbarSwap) {
-                if(clickInfo.player.inventory.getItemStack(click.hotbarSlot).isAir) {
+                if(clickInfo.player.inventory.getItemStack(click.hotbarSlot).isAir && cost.take(clickInfo.player)) {
                     clickInfo.player.inventory.setItemStack(click.hotbarSlot, result)
                     onSuccess(clickInfo.player)
                     onOverallSuccess(clickInfo.player)
@@ -271,39 +275,56 @@ sealed interface Slot {
                 return
             }
             if(click is Click.LeftShift || click is Click.RightShift) {
-                if(!clickInfo.player.inventory.addItemStack(result, TransactionOption.DRY_RUN)) {
-                    onFailure(clickInfo.player)
-                    return
-                }
+                var times = 0
                 while(true) {
+                    val currentCost = getCost()
                     val currentResult = getResult()
                     if(!currentResult.isSimilar(result)) break
-                    if(!clickInfo.player.inventory.addItemStack(currentResult, TransactionOption.DRY_RUN)) break
+                    if(!clickInfo.player.inventory.addItemStack(currentResult, TransactionOption.DRY_RUN) ||
+                        !currentCost.take(clickInfo.player)) break
                     InventoryUtils.addLikeShiftClick(currentResult, clickInfo.player)
                     onSuccess(clickInfo.player)
+                    times++
                 }
-                onOverallSuccess(clickInfo.player)
+                if(times == 0) {
+                    onFailure(clickInfo.player)
+                }
+                else {
+                    onOverallSuccess(clickInfo.player)
+                }
                 return
             }
             if(click is Click.DropSlot) {
                 if(click.all) {
+                    var times = 0
                     while(true) {
+                        val currentCost = getCost()
                         val currentResult = getResult()
-                        if(!currentResult.isSimilar(result)) break
+                        if(!currentResult.isSimilar(result) ||
+                            !currentCost.take(clickInfo.player)) break
                         clickInfo.player.dropItem(currentResult)
                         onSuccess(clickInfo.player)
+                        times++
                     }
-                    onOverallSuccess(clickInfo.player)
+                    if(times == 0) {
+                        onFailure(clickInfo.player)
+                    }
+                    else {
+                        onOverallSuccess(clickInfo.player)
+                    }
                 }
-                else {
+                else if(cost.take(clickInfo.player)) {
                     clickInfo.player.dropItem(result)
                     onSuccess(clickInfo.player)
                     onOverallSuccess(clickInfo.player)
                 }
+                else {
+                    onFailure(clickInfo.player)
+                }
                 return
             }
             if(click is Click.OffhandSwap) {
-                if(canSwapHands(clickInfo.player)) {
+                if(canSwapHands(clickInfo.player) && cost.take(clickInfo.player)) {
                     onSuccess(clickInfo.player)
                     onOverallSuccess(clickInfo.player)
                     onSuccessfulSwapHands(result, clickInfo.player)
@@ -329,6 +350,9 @@ sealed interface Slot {
             return false
         }
         open fun onSuccessfulSwapHands(result: ItemStack, player: Player) {}
+        open fun getCost(): Cost {
+            return Cost.free()
+        }
     }
     abstract class Button : Slot {
         abstract fun onClick(player: Player, click: ButtonClick)

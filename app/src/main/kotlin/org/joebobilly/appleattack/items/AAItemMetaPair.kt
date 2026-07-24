@@ -3,11 +3,14 @@ package org.joebobilly.appleattack.items
 import net.minestom.server.item.ItemStack
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
 import net.minestom.server.tag.TagWritable
+import org.joebobilly.appleattack.utils.TagCopySerializer
 import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
 
-data class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, val meta: METATYPE) {
+class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, meta: METATYPE) {
+    val meta = itemType.copyMeta(meta)
+        get() = itemType.copyMeta(field)
+
     companion object {
         fun tag(key: String): Tag<AAItemMetaPair<*>> {
             return Tag.Structure(key, Serializer)
@@ -41,7 +44,7 @@ data class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, val meta: ME
         return null
     }
 
-    object Serializer : TagSerializer<AAItemMetaPair<*>> {
+    object Serializer : TagCopySerializer<AAItemMetaPair<*>> {
         override fun read(reader: TagReadable): AAItemMetaPair<*> {
             val itemType = reader.getTagOrThrow(AAItem.itemTag)
             return readPair(reader, itemType)
@@ -59,6 +62,14 @@ data class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, val meta: ME
 
         private fun <METATYPE> writeMeta(writer: TagWritable, value: AAItemMetaPair<METATYPE>) {
             writer.setTag(value.itemType.metaTag, value.meta)
+        }
+
+        override fun copy(value: AAItemMetaPair<*>): AAItemMetaPair<*> {
+            return makeCopy(value)
+        }
+
+        private fun <METATYPE> makeCopy(value: AAItemMetaPair<METATYPE>): AAItemMetaPair<METATYPE> {
+            return AAItemMetaPair(value.itemType, value.meta)
         }
     }
 }
