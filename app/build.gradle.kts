@@ -21,6 +21,7 @@ repositories {
 dependencies {
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation(project(":common"))
     implementation(libs.guava)
     implementation(libs.minestom)
     implementation(libs.slf4j.simple)
@@ -35,7 +36,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.AppKt"
+    mainClass = "org.joebobilly.appleattack.AppKt"
 }
 
 tasks.named<Test>("test") {

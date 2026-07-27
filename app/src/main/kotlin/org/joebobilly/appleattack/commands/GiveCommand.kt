@@ -7,6 +7,7 @@ import net.minestom.server.command.CommandSender
 import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.CommandContext
 import net.minestom.server.command.builder.arguments.ArgumentType
+import net.minestom.server.command.builder.suggestion.SuggestionEntry
 import net.minestom.server.entity.Player
 import net.minestom.server.inventory.TransactionOption
 import org.joebobilly.appleattack.items.AAItemManager
@@ -21,7 +22,7 @@ object GiveCommand : Command("give") {
         val idArgument = ArgumentType.String("id")
         idArgument.suggestionCallback = {
             _, _, suggestion ->
-            AAItemManager.getSuggestions(suggestion.input).forEach {
+            AAItemManager.getSuggestions(suggestion.input) { SuggestionEntry(it) }.forEach {
                 entry -> suggestion.addEntry(entry)
             }
         }

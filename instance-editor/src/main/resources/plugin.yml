@@ -1,0 +1,12 @@
+name: InstanceEditor
+version: '1.0-SNAPSHOT'
+main: org.joebobilly.appleattack.InstanceEditor
+api-version: '1.21.11'
+depend: [Holograms]
+commands:
+  positionlist:
+    description: "Provides you with a position list item used for defining mob spawners"
+    usage: "/positionlist"
+    aliases: [poslist, plist, pl]
+    permission: instanceeditor.positionlist
+    permission-message: "You do not have permission to use this command"

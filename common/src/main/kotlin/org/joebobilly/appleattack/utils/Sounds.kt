@@ -4,7 +4,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 
 object Sounds {
-    val BLOCKED_OUTPUT = Sound.sound(Key.key("minecraft:entity.shulker.hurt_closed"), Sound.Source.MASTER, 1f, 1f)
+    val BLOCKED = Sound.sound(Key.key("minecraft:entity.shulker.hurt_closed"), Sound.Source.MASTER, 1f, 1f)
     val FORGE_SUCCEED = Sound.sound(Key.key("minecraft:block.anvil.use"), Sound.Source.MASTER, 1f, 2f)
     val UPGRADE_SUCCEED = Sound.sound(Key.key("minecraft:block.smithing_table.use"), Sound.Source.MASTER, 1f, 1f)
     val REINFORCE_SUCCEED = Sound.sound(Key.key("minecraft:block.anvil.use"), Sound.Source.MASTER, 1f, 1.5f)
@@ -15,4 +15,8 @@ object Sounds {
     val GENERIC_TALK = Sound.sound(Key.key("minecraft:entity.villager.ambient"), Sound.Source.NEUTRAL, 1f, 1.5f)
     val GENERIC_PURCHASE = Sound.sound(Key.key("minecraft:entity.villager.yes"), Sound.Source.NEUTRAL, 1f, 1.5f)
     val GENERIC_REFUSE = Sound.sound(Key.key("minecraft:entity.villager.no"), Sound.Source.NEUTRAL, 1f, 1.5f)
+
+    // instance editor
+    val POSITION_ADD = Sound.sound(Key.key("minecraft:block.note_block.snare"), Sound.Source.MASTER, 1f, 1f)
+    val POSITION_REMOVE = Sound.sound(Key.key("minecraft:block.amethyst_cluster.break"), Sound.Source.MASTER, 1f, 1f)
 }

@@ -343,7 +343,7 @@ sealed interface Slot {
         abstract fun onSuccess(player: Player)
         abstract fun onOverallSuccess(player: Player)
         open fun onFailure(player: Player) {
-            player.playSound(Sounds.BLOCKED_OUTPUT)
+            player.playSound(Sounds.BLOCKED)
         }
 
         open fun canSwapHands(player: Player): Boolean {

@@ -7,6 +7,7 @@ import net.minestom.server.command.CommandSender
 import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.CommandContext
 import net.minestom.server.command.builder.arguments.ArgumentType
+import net.minestom.server.command.builder.suggestion.SuggestionEntry
 import net.minestom.server.entity.Player
 import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.AAItemMetaPair
@@ -23,7 +24,7 @@ object AddUpgradeCommand : Command("addupgrade") {
         val idArgument = ArgumentType.String("id")
         idArgument.suggestionCallback = {
             _, _, suggestion ->
-            AAItemManager.getSuggestions(suggestion.input).forEach {
+            AAItemManager.getSuggestions(suggestion.input) { SuggestionEntry(it) }.forEach {
                 entry -> suggestion.addEntry(entry)
             }
         }

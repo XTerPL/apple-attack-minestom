@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "apple-attack-mc"
-include("app")
+include("app", "instance-editor", "common")

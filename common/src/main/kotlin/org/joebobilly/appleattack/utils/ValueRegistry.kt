@@ -1,6 +1,5 @@
 package org.joebobilly.appleattack.utils
 
-import net.minestom.server.command.builder.suggestion.SuggestionEntry
 import java.util.Collections
 
 abstract class ValueRegistry<T>(val idProvider: (T) -> String, val name: String) {
@@ -32,7 +31,7 @@ abstract class ValueRegistry<T>(val idProvider: (T) -> String, val name: String)
         }
         return null
     }
-    fun getSuggestions(input: String): List<SuggestionEntry> {
-        return values.keys.toList().filter { key -> key.lowercase().startsWith(input.lowercase()) }.map { key -> SuggestionEntry(key) }
+    fun <T> getSuggestions(input: String, suggestionEntryFactory: (String) -> T): List<T> {
+        return values.keys.toList().filter { key -> key.lowercase().startsWith(input.lowercase()) }.map(suggestionEntryFactory)
     }
 }

@@ -9,3 +9,4 @@ build
 
 # Ignore player saves (where do I even put them lol)
 /saves/
+/instance-editor/run/
