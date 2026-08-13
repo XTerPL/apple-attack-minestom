@@ -3,10 +3,13 @@ package org.joebobilly.appleattack.players
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.minestom.server.entity.Player
-import net.minestom.server.item.ItemStack
-import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
 import org.joebobilly.appleattack.items.ItemStackSerializer
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 import java.util.logging.Logger
@@ -17,7 +20,7 @@ object PlayerSaveManager {
 
     private val saveFolder = Path("saves")
 
-    private val inventoryTag: Tag<List<ItemStack>> = ItemStackSerializer.tag("inventory").list().defaultValue(emptyList())
+    private val inventoryTag = ItemStackSerializer.list().toEntry("inventory")
 
     fun savePlayer(player: Player) {
         val data = serializePlayer(player)
@@ -57,16 +60,17 @@ object PlayerSaveManager {
 
     private fun serializePlayer(player: Player): CompoundBinaryTag {
         val handler = TagHandler.newHandler()
+        val context = SerializationContext.Minestom(handler)
 
-        handler.setTag(inventoryTag, listOf(*player.inventory.itemStacks))
+        context.write(inventoryTag, listOf(*player.inventory.itemStacks))
 
         return handler.asCompound()
     }
 
     private fun deserializePlayer(player: Player, data: CompoundBinaryTag) {
-        val handler = TagHandler.fromCompound(data)
+        val context = DeserializationContext.Minestom(data)
 
-        val inventory = handler.getTag(inventoryTag)
+        val inventory = context.read(inventoryTag) { emptyList() }
         for(i in 0..<inventory.size) {
             player.inventory.setItemStack(i, inventory[i])
         }

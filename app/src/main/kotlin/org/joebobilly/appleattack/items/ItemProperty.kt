@@ -12,7 +12,7 @@ import org.joebobilly.appleattack.items.icons.ItemIcon
 class ItemProperty<T, R> private constructor(
     val name: String,
     val postProcess: (R) -> T,
-    val default: ((AAItem<*>?) -> T)? = null,
+    val default: ((AAItem<*>?) -> R)? = null,
 ) {
     companion object {
         val NAME = of<Component, Component>("name", { it.colorIfAbsent(NamedTextColor.WHITE) }) {
@@ -35,7 +35,7 @@ class ItemProperty<T, R> private constructor(
         // only makes sense on ToolItem
         val TOOL_DATA = of<ToolData, ToolData.Provider>("tool_data", { it.getToolData() })
 
-        fun <T, R> of(name: String, postProcess: (R) -> T, default: ((AAItem<*>?) -> T)? = null): ItemProperty<T, R> {
+        fun <T, R> of(name: String, postProcess: (R) -> T, default: ((AAItem<*>?) -> R)? = null): ItemProperty<T, R> {
             return ItemProperty(name, postProcess, default)
         }
         fun <T> of(name: String, default: ((AAItem<*>?) -> T)? = null): ItemProperty<T, T> {
@@ -63,6 +63,6 @@ class ItemProperty<T, R> private constructor(
 
     fun getDefaultOrThrow(itemType: AAItem<*>?): T {
         if(default == null) throw NoSuchElementException("No property with name $name in item")
-        return default(itemType)
+        return postProcess(default(itemType))
     }
 }

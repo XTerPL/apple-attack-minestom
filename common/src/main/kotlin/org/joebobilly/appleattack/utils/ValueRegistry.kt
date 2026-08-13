@@ -31,6 +31,9 @@ abstract class ValueRegistry<T>(val idProvider: (T) -> String, val name: String)
         }
         return null
     }
+    fun getOrThrow(id: String): T {
+        return get(id) ?: throw NoSuchElementException("Unknown $name '$id'!")
+    }
     fun <T> getSuggestions(input: String, suggestionEntryFactory: (String) -> T): List<T> {
         return values.keys.toList().filter { key -> key.lowercase().startsWith(input.lowercase()) }.map(suggestionEntryFactory)
     }

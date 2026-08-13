@@ -1,10 +1,13 @@
 package org.joebobilly.appleattack.items.tools
 
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.ItemProperty
-import org.joebobilly.appleattack.utils.TagCopySerializer
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
 
 open class ToolMeta {
     private val upgradeItems = mutableListOf<AAItemMetaPair<*>>()
@@ -35,18 +38,19 @@ open class ToolMeta {
         return meta
     }
 
-    object Serializer : TagCopySerializer<ToolMeta> {
-        private val upgradeItems = AAItemMetaPair.tag("upgrades").list().defaultValue(emptyList())
+    object Serializer : NBTCopySerializer<ToolMeta>(ToolMeta::class) {
+        private val upgradeItems = AAItemMetaPair.Serializer.list().toEntry("upgrades")
 
-        override fun read(reader: TagReadable): ToolMeta {
-            val upgradeItems = reader.getTag(upgradeItems).filter { it?.hasProperty(ItemProperty.FORGE_UPGRADE_DATA) == true }
+        override fun read(context: DeserializationContext): ToolMeta {
+            val upgradeItems = context.read(upgradeItems) { emptyList() }
+                .filter { it.hasProperty(ItemProperty.FORGE_UPGRADE_DATA) }
             return ToolMeta().apply {
                 this.upgradeItems.addAll(upgradeItems)
             }
         }
 
-        override fun write(writer: TagWritable, value: ToolMeta) {
-            writer.setTag(upgradeItems, value.upgradeItems)
+        override fun write(context: SerializationContext, value: ToolMeta) {
+            context.write(upgradeItems, value.upgradeItems)
         }
 
         override fun copy(value: ToolMeta): ToolMeta {

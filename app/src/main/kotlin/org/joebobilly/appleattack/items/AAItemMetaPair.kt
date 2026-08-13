@@ -1,21 +1,16 @@
 package org.joebobilly.appleattack.items
 
 import net.minestom.server.item.ItemStack
-import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagWritable
-import org.joebobilly.appleattack.utils.TagCopySerializer
-import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
 
-class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, meta: METATYPE) {
+class AAItemMetaPair<METATYPE : Any>(val itemType: AAItem<METATYPE>, meta: METATYPE) {
     val meta = itemType.copyMeta(meta)
         get() = itemType.copyMeta(field)
 
     companion object {
-        fun tag(key: String): Tag<AAItemMetaPair<*>> {
-            return Tag.Structure(key, Serializer)
-        }
-
         fun AAItemMetaPair<*>?.hasProperty(property: ItemProperty<*, *>): Boolean {
             if(this != null) return hasProperty(property)
             return property.default != null
@@ -44,31 +39,31 @@ class AAItemMetaPair<METATYPE>(val itemType: AAItem<METATYPE>, meta: METATYPE) {
         return null
     }
 
-    object Serializer : TagCopySerializer<AAItemMetaPair<*>> {
-        override fun read(reader: TagReadable): AAItemMetaPair<*> {
-            val itemType = reader.getTagOrThrow(AAItem.itemTag)
-            return readPair(reader, itemType)
+    object Serializer : NBTCopySerializer<AAItemMetaPair<*>>(AAItemMetaPair::class) {
+        override fun read(context: DeserializationContext): AAItemMetaPair<*> {
+            val itemType = context.read(AAItem.itemEntry)
+            return readPair(context, itemType)
         }
 
-        private fun <METATYPE> readPair(reader: TagReadable, itemType: AAItem<METATYPE>): AAItemMetaPair<*> {
-            val meta = reader.getTagOrThrow(itemType.metaTag)
+        private fun <METATYPE : Any> readPair(context: DeserializationContext, itemType: AAItem<METATYPE>): AAItemMetaPair<*> {
+            val meta = context.read(itemType.metaEntry)
             return AAItemMetaPair(itemType, meta)
         }
 
-        override fun write(writer: TagWritable, value: AAItemMetaPair<*>) {
-            writeMeta(writer, value)
-            writer.setTag(AAItem.itemTag, value.itemType)
+        override fun write(context: SerializationContext, value: AAItemMetaPair<*>) {
+            writeMeta(context, value)
+            context.write(AAItem.itemEntry, value.itemType)
         }
 
-        private fun <METATYPE> writeMeta(writer: TagWritable, value: AAItemMetaPair<METATYPE>) {
-            writer.setTag(value.itemType.metaTag, value.meta)
+        private fun <METATYPE : Any> writeMeta(context: SerializationContext, value: AAItemMetaPair<METATYPE>) {
+            context.write(value.itemType.metaEntry, value.meta)
         }
 
         override fun copy(value: AAItemMetaPair<*>): AAItemMetaPair<*> {
             return makeCopy(value)
         }
 
-        private fun <METATYPE> makeCopy(value: AAItemMetaPair<METATYPE>): AAItemMetaPair<METATYPE> {
+        private fun <METATYPE : Any> makeCopy(value: AAItemMetaPair<METATYPE>): AAItemMetaPair<METATYPE> {
             return AAItemMetaPair(value.itemType, value.meta)
         }
     }

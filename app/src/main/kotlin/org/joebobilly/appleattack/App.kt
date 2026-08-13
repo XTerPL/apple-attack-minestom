@@ -40,6 +40,7 @@ import org.joebobilly.appleattack.players.PlayerSaveManager
 import org.joebobilly.appleattack.entities.spawners.MobSpawner
 import org.joebobilly.appleattack.entities.spawners.NPCSpawner
 import org.joebobilly.appleattack.entities.spawners.SpawnerManager
+import org.joebobilly.appleattack.utils.Position
 import java.nio.file.Path
 import java.util.logging.Logger
 
@@ -95,13 +96,13 @@ fun main() {
 
     SpawnerManager.registerSpawner(
         MobSpawner(AppleMob, 5, listOf(
-            Pos(-20.5, 57.0, 88.5),
-            Pos(-15.5, 57.0, 86.5),
-            Pos(-24.5, 57.0, 83.5)
+            Position(-20.5, 57.0, 88.5),
+            Position(-15.5, 57.0, 86.5),
+            Position(-24.5, 57.0, 83.5)
         )), instance
     )
     SpawnerManager.registerSpawner(
-        NPCSpawner(TestNPC, Pos(-16.5, 57.0, 55.5)), instance
+        NPCSpawner(TestNPC, Position(-16.5, 57.0, 55.5)), instance
     )
 
     val spawnPoint = Pos(-8.0, 57.0, 64.0)

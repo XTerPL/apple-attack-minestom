@@ -44,13 +44,13 @@ sealed interface Reward {
         val CRATE_PROFILE = ResolvableProfile(PlayerSkin(CRATE_HEAD_TEXTURE, null))
     }
 
-    class Item<METATYPE> private constructor(
+    class Item<METATYPE : Any> private constructor(
             val type: AAItem<METATYPE>,
             val meta: METATYPE,
             val count: Int
         ) : Reward {
         companion object {
-            fun <METATYPE> of(type: AAItem<METATYPE>, meta: METATYPE): Item<METATYPE> {
+            fun <METATYPE : Any> of(type: AAItem<METATYPE>, meta: METATYPE): Item<METATYPE> {
                 return Item(type, meta, 1)
             }
             fun of(type: BasicAAItem): Item<Unit> {

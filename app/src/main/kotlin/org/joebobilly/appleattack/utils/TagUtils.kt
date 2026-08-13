@@ -8,12 +8,12 @@ import net.minestom.server.MinecraftServer
 import net.minestom.server.codec.Codec
 import net.minestom.server.codec.Result
 import net.minestom.server.codec.Transcoder
-import net.minestom.server.coordinate.Pos
 import net.minestom.server.item.component.BannerPatterns
 import net.minestom.server.network.player.ResolvableProfile
 import net.minestom.server.registry.RegistryTranscoder
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagReadable
+import org.joebobilly.appleattack.serialization.NBTReadError
 
 object TagUtils {
     inline fun <reified R : Enum<R>> enumTag(key: String): Tag<R> {
@@ -36,8 +36,6 @@ object TagUtils {
                 val result = codec.decode(transcoderSupplier(), nbt)
                 if(result is Result.Error<R>) {
                     throw NBTReadError("", result.message)
-                    // println(MinestomAdventure.tagStringIO().asString(nbt))
-                    // println(result.message)
                 }
                 result.orElse(null)
             }, {
@@ -79,38 +77,13 @@ object TagUtils {
         )
     }
 
-    fun posTag(key: String): Tag<Pos> {
-        return Tag.Double(key).list().map(
-            {
-                list ->
-                when (list.size) {
-                    3 -> Pos(list[0], list[1], list[2])
-                    5 -> Pos(list[0], list[1], list[2], list[3].toFloat(), list[4].toFloat())
-                    else -> throw NBTReadError("", "invalid list size: must be 3 or 5")
-                }
-            }, {
-                pos -> listOf(pos.x, pos.y, pos.z, pos.yaw.toDouble(), pos.pitch.toDouble())
-            }
-        )
-    }
-
     fun <T> TagReadable.getTagSourced(tag: Tag<T>): T? {
-        try {
-            return this.getTag(tag)
-        }
-        catch(e: NBTReadError) {
-            throw e.addSource(tag.key())
-        }
-        catch(e: Exception) {
-            throw NBTReadError(tag.key(), e)
+        return NBTReadError.wrap(tag.key()) {
+            this.getTag(tag)
         }
     }
 
     fun <T> TagReadable.getTagOrThrow(tag: Tag<T>): T {
         return this.getTagSourced(tag) ?: throw NBTReadError(tag.key(), "not found or null")
-    }
-
-    fun checkOrThrow(condition: Boolean, source: String, lazyMessage: () -> String) {
-        if(!condition) throw NBTReadError(source, lazyMessage())
     }
 }

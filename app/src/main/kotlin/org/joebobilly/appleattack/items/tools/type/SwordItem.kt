@@ -1,8 +1,6 @@
 package org.joebobilly.appleattack.items.tools.type
 
 import net.kyori.adventure.text.Component
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.damage.AttackInfo
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.ItemProperty
@@ -10,10 +8,13 @@ import org.joebobilly.appleattack.items.tools.ForgeMaterial
 import org.joebobilly.appleattack.items.tools.ForgedToolMeta
 import org.joebobilly.appleattack.items.tools.ToolMeta
 import org.joebobilly.appleattack.items.tools.ToolStat
-import org.joebobilly.appleattack.utils.TagCopySerializer
-import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
 
-sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagCopySerializer<METATYPE>)
+sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: NBTCopySerializer<METATYPE>)
     : ToolItem<METATYPE>(id, ToolType.SWORD, metaSerializer) {
     abstract class Defined(id: String) : SwordItem<ToolMeta>(id, ToolMeta.Serializer)
     object Forged : SwordItem<ForgedToolMeta<Recipe>>("forged_sword",
@@ -50,23 +51,23 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: TagCopyS
             return bladeDown
         }
 
-        object Serializer : TagCopySerializer<Recipe> {
-            val handle = AAItemMetaPair.tag("handle")
-            val bladeDown = AAItemMetaPair.tag("blade_down")
-            val bladeUp = AAItemMetaPair.tag("blade_up")
+        object Serializer : NBTCopySerializer<Recipe>(Recipe::class) {
+            val handle = AAItemMetaPair.Serializer.toEntry("handle")
+            val bladeDown = AAItemMetaPair.Serializer.toEntry("blade_down")
+            val bladeUp = AAItemMetaPair.Serializer.toEntry("blade_up")
 
-            override fun read(reader: TagReadable): Recipe {
+            override fun read(context: DeserializationContext): Recipe {
                 return Recipe(
-                    reader.getTagOrThrow(handle),
-                    reader.getTagOrThrow(bladeDown),
-                    reader.getTagOrThrow(bladeUp)
+                    context.read(handle),
+                    context.read(bladeDown),
+                    context.read(bladeUp)
                 )
             }
 
-            override fun write(writer: TagWritable, value: Recipe) {
-                writer.setTag(handle, value.handle)
-                writer.setTag(bladeDown, value.bladeDown)
-                writer.setTag(bladeUp, value.bladeUp)
+            override fun write(context: SerializationContext, value: Recipe) {
+                context.write(handle, value.handle)
+                context.write(bladeDown, value.bladeDown)
+                context.write(bladeUp, value.bladeUp)
             }
 
             override fun copy(value: Recipe): Recipe {

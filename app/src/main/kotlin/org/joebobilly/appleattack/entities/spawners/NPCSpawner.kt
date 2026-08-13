@@ -3,43 +3,45 @@ package org.joebobilly.appleattack.entities.spawners
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Entity
 import net.minestom.server.instance.Instance
-import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
-import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.entities.AAEntityTypeManager
 import org.joebobilly.appleattack.entities.type.NPCType
-import org.joebobilly.appleattack.utils.NBTReadError
-import org.joebobilly.appleattack.utils.TagUtils
-import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTReadError
+import org.joebobilly.appleattack.serialization.NBTSerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.map
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import org.joebobilly.appleattack.serialization.SerializationTypes
+import org.joebobilly.appleattack.utils.Position
 
-class NPCSpawner(val npcType: NPCType, val position: Pos)
+class NPCSpawner(val npcType: NPCType, val position: Position)
     : EntitySpawner(1) {
-    override fun getSpawnLocation(): Pos {
+    override fun getSpawnLocation(): Position {
         return position
     }
     override fun spawnEntity(instance: Instance, spawnLocation: Pos): Entity? {
         return npcType.spawn(instance, spawnLocation)
     }
 
-    object Serializer : TagSerializer<NPCSpawner> {
-        val npcType: Tag<NPCType> = Tag.String("id").map(
+    object Serializer : NBTSerializer<NPCSpawner>(NPCSpawner::class) {
+        val npcType = SerializationTypes.STRING.map(
             {
-                val type = AAEntityTypeManager.get(it)
+                val type = AAEntityTypeManager.getOrThrow(it)
                 type as? NPCType ?: throw NBTReadError("", "$type is not a npc type!")
             }, NPCType::id
-        )
-        val position = TagUtils.posTag("position")
+        ).toEntry("id")
+        val position = SerializationTypes.POSITION.toEntry("position")
 
-        override fun read(reader: TagReadable): NPCSpawner {
-            val type = reader.getTagOrThrow(npcType)
-            val position = reader.getTagOrThrow(position)
+        override fun read(context: DeserializationContext): NPCSpawner {
+            val type = context.read(npcType)
+            val position = context.read(position)
             return NPCSpawner(type, position)
         }
 
-        override fun write(writer: TagWritable, value: NPCSpawner) {
-            writer.setTag(npcType, value.npcType)
-            writer.setTag(position, value.position)
+        override fun write(context: SerializationContext, value: NPCSpawner) {
+            context.write(npcType, value.npcType)
+            context.write(position, value.position)
         }
     }
 }

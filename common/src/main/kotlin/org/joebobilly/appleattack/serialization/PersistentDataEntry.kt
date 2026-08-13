@@ -1,14 +1,14 @@
-package org.joebobilly.appleattack.utils
+package org.joebobilly.appleattack.serialization
 
 import io.papermc.paper.persistence.PersistentDataContainerView
 import net.kyori.adventure.key.Key
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
-import org.joebobilly.appleattack.InstanceEditor
+import org.joebobilly.appleattack.utils.KeyUtils
 import org.joebobilly.appleattack.utils.KeyUtils.toNamespacedKey
 
 data class PersistentDataEntry<P : Any, C : Any>(val key: Key, val type: PersistentDataType<P, C>) {
-    constructor(key: String, type: PersistentDataType<P, C>) : this(InstanceEditor.key(key), type)
+    constructor(key: String, type: PersistentDataType<P, C>) : this(KeyUtils.of(key), type)
 
     fun get(container: PersistentDataContainerView): C? {
         return container.get(key.toNamespacedKey(), type)

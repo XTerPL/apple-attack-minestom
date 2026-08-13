@@ -14,6 +14,8 @@ class SignText(val hasGlowingText: Boolean, val color: DyeColor, val messages: L
         }
     }
 
+    // uniquely, this is a minestom serializer instead of our own implementation as we need the ability to use
+    // the codec system for component lists as minestom's tag system does not work with heterogeneous lists
     object Serializer : TagSerializer<SignText> {
         private val hasGlowingText = Tag.Boolean("has_glowing_text").defaultValue(false)
         private val color = TagUtils.enumTag<DyeColor>("color").defaultValue(DyeColor.BLACK)

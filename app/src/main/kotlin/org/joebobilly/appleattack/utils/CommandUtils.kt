@@ -6,15 +6,12 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.minestom.server.command.CommandSender
 import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.AAItemMetaPair
+import org.joebobilly.appleattack.serialization.NBTReadError
 
 object CommandUtils {
-    fun <METATYPE> parseItemMetaPair(sender: CommandSender?, itemType: AAItem<METATYPE>, metaNbt: CompoundBinaryTag) : AAItemMetaPair<METATYPE>? {
+    fun <METATYPE : Any> parseItemMetaPair(sender: CommandSender?, itemType: AAItem<METATYPE>, metaNbt: CompoundBinaryTag) : AAItemMetaPair<METATYPE>? {
         try {
             val meta = itemType.deserializeMeta(metaNbt)
-            if(meta == null) {
-                sender?.sendMessage(Component.text("Invalid meta for item ${itemType.id}", NamedTextColor.RED))
-                return null
-            }
             return AAItemMetaPair(itemType, meta)
         }
         catch(e: NBTReadError) {

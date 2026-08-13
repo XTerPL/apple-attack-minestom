@@ -18,7 +18,7 @@ object PositionListListener : Listener {
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val mainHand = event.player.inventory.itemInMainHand
-        val positionList = PositionList.POSITION_LIST_ENTRY.get(mainHand.persistentDataContainer) ?: return
+        val positionList = PositionList.POSITION_LIST_ENTRY.persistentDataEntry.get(mainHand.persistentDataContainer) ?: return
 
         if(event.action == Action.RIGHT_CLICK_BLOCK || event.action == Action.RIGHT_CLICK_AIR) {
             if(positionList.addPosition(event.player.location)) {
@@ -36,7 +36,7 @@ object PositionListListener : Listener {
         else return
 
         mainHand.editPersistentDataContainer {
-            PositionList.POSITION_LIST_ENTRY.set(it, positionList)
+            PositionList.POSITION_LIST_ENTRY.persistentDataEntry.set(it, positionList)
         }
         PositionList.updatePositionListItem(mainHand)
     }
@@ -48,7 +48,7 @@ object PositionListListener : Listener {
         if(inventory !is PlayerInventory) return
         if(event.slot != inventory.heldItemSlot) return
         val mainHand = inventory.itemInMainHand
-        val positionList = PositionList.POSITION_LIST_ENTRY.get(mainHand.persistentDataContainer)
+        val positionList = PositionList.POSITION_LIST_ENTRY.persistentDataEntry.get(mainHand.persistentDataContainer)
             ?: return removePositionListHologram(player)
         positionList.showToPlayer(player)
     }
@@ -58,7 +58,7 @@ object PositionListListener : Listener {
         val player = event.player
         val mainHand = player.inventory.getItem(event.newSlot)
             ?: return removePositionListHologram(player)
-        val positionList = PositionList.POSITION_LIST_ENTRY.get(mainHand.persistentDataContainer)
+        val positionList = PositionList.POSITION_LIST_ENTRY.persistentDataEntry.get(mainHand.persistentDataContainer)
             ?: return removePositionListHologram(player)
         positionList.showToPlayer(player)
     }

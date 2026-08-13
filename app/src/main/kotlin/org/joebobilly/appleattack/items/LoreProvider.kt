@@ -43,7 +43,7 @@ interface LoreProvider {
     }
 
     data class LoreProviderEntry<T>(val property: ItemProperty<T, *>, val loreProvider: (T, AAItemMetaPair<*>) -> List<Component>) {
-        fun <METATYPE> getLore(itemType: AAItem<METATYPE>, meta: METATYPE): List<Component> {
+        fun <METATYPE : Any> getLore(itemType: AAItem<METATYPE>, meta: METATYPE): List<Component> {
             return itemType.withProperty(property, meta) {
                 loreProvider(it, AAItemMetaPair(itemType, meta))
             } ?: emptyList()

@@ -5,22 +5,24 @@ import net.kyori.adventure.text.Component
 import net.minestom.server.component.DataComponents
 import net.minestom.server.item.ItemStack
 import net.minestom.server.item.Material
-import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagHandler
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.map
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import org.joebobilly.appleattack.serialization.SerializationTypes
 import org.joebobilly.appleattack.utils.InventoryUtils
-import org.joebobilly.appleattack.utils.TagCopySerializer
 
-abstract class AAItem<METATYPE>(
+abstract class AAItem<METATYPE : Any>(
     val id: String,
-    private val metaSerializer: TagCopySerializer<METATYPE>,
+    private val metaSerializer: NBTCopySerializer<METATYPE>,
     val maxCount: Int = 64, val backingMaterial: Material = Material.STRUCTURE_BLOCK
 ) {
     companion object {
-        internal val idTag = Tag.String("id")
-        internal val itemTag = idTag.map<AAItem<*>>(AAItemManager::get, AAItem<*>::id)
+        internal val itemEntry = SerializationTypes.STRING
+            .map(AAItemManager::getOrThrow, AAItem<*>::id).toEntry("id")
     }
 
-    internal val metaTag = Tag.Structure("meta", metaSerializer)
+    internal val metaEntry = metaSerializer.toEntry("meta")
     private val properties = ItemProperty.Map<METATYPE>()
 
     init {
@@ -42,7 +44,7 @@ abstract class AAItem<METATYPE>(
         update(builder, meta)
         return builder.material(backingMaterial)
                       .maxStackSize(maxCount).amount(count)
-                      .set(itemTag, this).set(metaTag, meta).build()
+                      .set(itemEntry.minestomTag, this).set(metaEntry.minestomTag, meta).build()
     }
 
     // modification
@@ -53,10 +55,15 @@ abstract class AAItem<METATYPE>(
 
     // identification
     fun isItem(itemStack: ItemStack): Boolean {
-        return itemStack.getTag(itemTag) == this
+        return try {
+            itemStack.getTag(itemEntry.minestomTag) == this
+        }
+        catch(_: Exception) {
+            false
+        }
     }
     fun getMeta(itemStack: ItemStack): METATYPE? {
-        if(isItem(itemStack)) return itemStack.getTag(metaTag)
+        if(isItem(itemStack)) return itemStack.getTag(metaEntry.minestomTag)
         return null
     }
     fun getMetaPair(itemStack: ItemStack): AAItemMetaPair<METATYPE>? {
@@ -65,8 +72,8 @@ abstract class AAItem<METATYPE>(
     }
 
     // serialization
-    fun deserializeMeta(nbt: CompoundBinaryTag): METATYPE? {
-        return metaSerializer.read(TagHandler.fromCompound(nbt))
+    fun deserializeMeta(nbt: CompoundBinaryTag): METATYPE {
+        return metaSerializer.read(DeserializationContext.Minestom(nbt))
     }
     internal fun copyMeta(meta: METATYPE): METATYPE {
         return metaSerializer.copy(meta)
@@ -77,7 +84,7 @@ abstract class AAItem<METATYPE>(
     fun <T, R> ItemProperty<T, R>.set(provider: (METATYPE) -> R) {
         setPropertyProvider(this, provider)
     }
-    fun <T> ItemProperty<T, T>.append(nextProvider: (T, METATYPE) -> T) {
+    fun <T, R> ItemProperty<T, R>.append(nextProvider: (R, METATYPE) -> R) {
         check(hasProperty(this)) {
             "Cannot append another provider for the property $name " +
                     "when there isn't even a previous provider yet... (use .set instead of .append)"

@@ -75,7 +75,7 @@ class ReinforcementInterface(val reinforcement: Reinforcement)
         return backgroundIcon
     }
 
-    private fun <METATYPE> tryReinforce(itemMetaPair: AAItemMetaPair<METATYPE>): Pair<AAItemMetaPair<*>, Cost>? {
+    private fun <METATYPE : Any> tryReinforce(itemMetaPair: AAItemMetaPair<METATYPE>): Pair<AAItemMetaPair<*>, Cost>? {
         val meta = itemMetaPair.meta
         if(meta is ToolMeta) {
             @Suppress("UNCHECKED_CAST")

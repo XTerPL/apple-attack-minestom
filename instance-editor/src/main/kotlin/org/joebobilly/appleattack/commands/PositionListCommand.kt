@@ -18,7 +18,7 @@ class PositionListCommand : CommandExecutor {
         }
         if(args.count() > 0) {
             val mainHand = sender.inventory.itemInMainHand
-            val positionList = PositionList.POSITION_LIST_ENTRY.get(mainHand.persistentDataContainer)
+            val positionList = PositionList.POSITION_LIST_ENTRY.persistentDataEntry.get(mainHand.persistentDataContainer)
             if(positionList == null) {
                 sender.sendMessage(Component.text("Cannot modify a non-position list item", NamedTextColor.RED))
                 return true
@@ -30,7 +30,7 @@ class PositionListCommand : CommandExecutor {
             }
             if(result != SubCommandResult.SUCCESS) return result == SubCommandResult.ERROR
             mainHand.editPersistentDataContainer {
-                PositionList.POSITION_LIST_ENTRY.set(it, positionList)
+                PositionList.POSITION_LIST_ENTRY.persistentDataEntry.set(it, positionList)
             }
             PositionList.updatePositionListItem(mainHand)
             return true

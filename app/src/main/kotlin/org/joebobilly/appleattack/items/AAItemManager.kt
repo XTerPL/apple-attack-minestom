@@ -5,7 +5,7 @@ import org.joebobilly.appleattack.utils.ValueRegistry
 
 object AAItemManager : ValueRegistry<AAItem<*>>(AAItem<*>::id, "item type") {
     fun getItem(itemStack: ItemStack): AAItem<*>? {
-        return itemStack.getTag(AAItem.itemTag)
+        return itemStack.getTag(AAItem.itemEntry.minestomTag)
     }
     fun getItemMetaPair(itemStack: ItemStack): AAItemMetaPair<*>? {
         val itemType = getItem(itemStack) ?: return null

@@ -2,34 +2,30 @@ package org.joebobilly.appleattack.items
 
 import net.minestom.server.adventure.MinestomAdventure
 import net.minestom.server.item.ItemStack
-import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
-import net.minestom.server.tag.TagWritable
-import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
-import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import org.joebobilly.appleattack.serialization.SerializationTypes
 import java.util.logging.Logger
 
-object ItemStackSerializer : TagSerializer<ItemStack> {
-    private val count = Tag.Integer("count").defaultValue(1)
+object ItemStackSerializer : NBTCopySerializer<ItemStack>(ItemStack::class) {
+    private val count = SerializationTypes.INTEGER.toEntry("count")
     private val invalidItemStackLogger = Logger.getLogger("invalid-item-stack")
 
-    fun tag(key: String): Tag<ItemStack> {
-        return Tag.Structure(key, this)
+    override fun read(context: DeserializationContext): ItemStack {
+        val itemType = context.readNullable(AAItem.itemEntry) ?: return ItemStack.AIR
+        val count = context.read(count, 1)
+        return readItem(context, itemType, count)
     }
 
-    override fun read(reader: TagReadable): ItemStack {
-        val itemType = reader.getTagSourced(AAItem.itemTag) ?: return ItemStack.AIR
-        val count = reader.getTag(count)
-        return readItem(reader, itemType, count)
-    }
-
-    private fun <METATYPE> readItem(reader: TagReadable, itemType: AAItem<METATYPE>, count: Int): ItemStack {
-        val meta = reader.getTagOrThrow(itemType.metaTag)
+    private fun <METATYPE : Any> readItem(context: DeserializationContext, itemType: AAItem<METATYPE>, count: Int): ItemStack {
+        val meta = context.read(itemType.metaEntry)
         return itemType.create(count, meta)
     }
 
-    override fun write(writer: TagWritable, value: ItemStack) {
+    override fun write(context: SerializationContext, value: ItemStack) {
         if(value.isAir) return
         val itemType = AAItemManager.getItem(value)
         if(itemType == null) {
@@ -37,21 +33,25 @@ object ItemStackSerializer : TagSerializer<ItemStack> {
                     + MinestomAdventure.tagStringIO().asString(value.toItemNBT()))
             return
         }
-        if(!writeMeta(writer, value, itemType)) {
+        if(!writeMeta(context, value, itemType)) {
             return
         }
-        writer.setTag(AAItem.itemTag, itemType)
-        writer.setTag(count, value.amount())
+        context.write(AAItem.itemEntry, itemType)
+        context.write(count, value.amount())
     }
 
-    private fun <METATYPE> writeMeta(writer: TagWritable, value: ItemStack, itemType: AAItem<METATYPE>): Boolean {
+    override fun copy(value: ItemStack): ItemStack {
+        return value
+    }
+
+    private fun <METATYPE : Any> writeMeta(context: SerializationContext, value: ItemStack, itemType: AAItem<METATYPE>): Boolean {
         val meta = itemType.getMeta(value)
         if(meta == null) {
             invalidItemStackLogger.severe("Invalid item meta found:\n"
                     + MinestomAdventure.tagStringIO().asString(value.toItemNBT()))
             return false
         }
-        writer.setTag(itemType.metaTag, meta)
+        context.write(itemType.metaEntry, meta)
         return true
     }
 }

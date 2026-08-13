@@ -27,7 +27,7 @@ interface ItemTypeNameProvider {
     }
 
     data class ItemTypeNameProviderEntry<T>(val property: ItemProperty<T, *>, val itemTypeNameProvider: (T, AAItemMetaPair<*>) -> String?) {
-        fun <METATYPE> getItemTypeName(metaTypePair: AAItemMetaPair<METATYPE>): String? {
+        fun <METATYPE : Any> getItemTypeName(metaTypePair: AAItemMetaPair<METATYPE>): String? {
             return metaTypePair.withProperty(property) {
                 itemTypeNameProvider(it, metaTypePair)
             }

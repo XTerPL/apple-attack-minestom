@@ -1,12 +1,13 @@
 package org.joebobilly.appleattack.items.tools
 
-import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagWritable
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.ItemProperty
-import org.joebobilly.appleattack.utils.TagCopySerializer
-import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import kotlin.reflect.KClass
 
 class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolMeta() {
     abstract class Recipe(internal val forgeMaterials : List<AAItemMetaPair<*>>) {
@@ -38,17 +39,19 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
         return recipe.getCoreMaterial().getProperty(ItemProperty.FORGE_MATERIAL)
     }
 
-    class Serializer<RECIPE : Recipe>(private val recipeSerializer: TagCopySerializer<RECIPE>) : TagCopySerializer<ForgedToolMeta<RECIPE>> {
-        private val recipe = Tag.Structure("recipe", recipeSerializer)
+    @Suppress("UNCHECKED_CAST")
+    class Serializer<RECIPE : Recipe>(private val recipeSerializer: NBTCopySerializer<RECIPE>)
+        : NBTCopySerializer<ForgedToolMeta<RECIPE>>( ForgedToolMeta::class as KClass<ForgedToolMeta<RECIPE>>) {
+        private val recipe = recipeSerializer.toEntry("recipe")
 
-        override fun read(reader: TagReadable): ForgedToolMeta<RECIPE> {
-            val recipe = reader.getTagOrThrow(recipe)
-            return ToolMeta.Serializer.read(reader).withRecipe(recipe)
+        override fun read(context: DeserializationContext): ForgedToolMeta<RECIPE> {
+            val recipe = context.read(recipe)
+            return ToolMeta.Serializer.read(context).withRecipe(recipe)
         }
 
-        override fun write(writer: TagWritable, value: ForgedToolMeta<RECIPE>) {
-            writer.setTag(recipe, value.recipe)
-            ToolMeta.Serializer.write(writer, value)
+        override fun write(context: SerializationContext, value: ForgedToolMeta<RECIPE>) {
+            context.write(recipe, value.recipe)
+            ToolMeta.Serializer.write(context, value)
         }
 
         override fun copy(value: ForgedToolMeta<RECIPE>): ForgedToolMeta<RECIPE> {

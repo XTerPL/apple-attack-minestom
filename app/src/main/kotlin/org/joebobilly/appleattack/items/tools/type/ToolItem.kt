@@ -11,9 +11,9 @@ import org.joebobilly.appleattack.items.tools.ForgeMaterial
 import org.joebobilly.appleattack.items.tools.ForgedToolMeta
 import org.joebobilly.appleattack.items.tools.ToolMeta
 import org.joebobilly.appleattack.items.icons.ItemIcon
-import org.joebobilly.appleattack.utils.TagCopySerializer
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
 
-sealed class ToolItem<METATYPE : ToolMeta>(id: String, val toolType: ToolType, metaSerializer: TagCopySerializer<METATYPE>)
+sealed class ToolItem<METATYPE : ToolMeta>(id: String, val toolType: ToolType, metaSerializer: NBTCopySerializer<METATYPE>)
     : AAItem<METATYPE>(id, metaSerializer, 1) {
     init {
         ItemProperty.TOOL_DATA.set {

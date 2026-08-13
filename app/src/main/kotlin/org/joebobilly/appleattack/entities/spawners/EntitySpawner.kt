@@ -4,20 +4,16 @@ import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Entity
 import net.minestom.server.event.entity.EntityDespawnEvent
 import net.minestom.server.instance.Instance
-import net.minestom.server.tag.Tag
-import net.minestom.server.tag.TagReadable
-import net.minestom.server.tag.TagSerializer
-import net.minestom.server.tag.TagWritable
-import org.joebobilly.appleattack.utils.NBTReadError
-import org.joebobilly.appleattack.utils.TagUtils.getTagOrThrow
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTReadError
+import org.joebobilly.appleattack.serialization.NBTSerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import org.joebobilly.appleattack.serialization.SerializationTypes
+import org.joebobilly.appleattack.utils.Position
 
 sealed class EntitySpawner(val maxSpawned: Int = 1) {
-    companion object {
-        fun tag(key: String): Tag<EntitySpawner> {
-            return Tag.Structure(key, Serializer)
-        }
-    }
-
     private var instance: Instance? = null
     private val spawnedEntities = mutableListOf<Entity>()
 
@@ -25,14 +21,14 @@ sealed class EntitySpawner(val maxSpawned: Int = 1) {
         return true
     }
     abstract fun spawnEntity(instance: Instance, spawnLocation: Pos): Entity?
-    abstract fun getSpawnLocation(): Pos?
+    abstract fun getSpawnLocation(): Position?
     fun trySpawn() {
         val instance = instance ?: return
         if(!instance.isRegistered) return
         if(spawnedEntities.count() >= maxSpawned) return
         if(!canSpawn()) return
         val spawnLocation = getSpawnLocation() ?: return
-        spawnEntity(instance, spawnLocation)?.apply {
+        spawnEntity(instance, spawnLocation.toMinestomPos())?.apply {
             if(this.instance == null) throw IllegalStateException("You need to set an instance for the spawned entity smh")
             eventNode().addListener(EntityDespawnEvent::class.java) {
                 spawnedEntities.remove(this)
@@ -54,25 +50,25 @@ sealed class EntitySpawner(val maxSpawned: Int = 1) {
         this.instance = instance
     }
 
-    object Serializer : TagSerializer<EntitySpawner> {
-        val typeTag: Tag<String> = Tag.String("spawner_type")
+    object Serializer : NBTSerializer<EntitySpawner>(EntitySpawner::class) {
+        val spawnerType = SerializationTypes.STRING.toEntry("spawner_type")
 
-        override fun read(reader: TagReadable): EntitySpawner {
-            return when(val type = reader.getTagOrThrow(typeTag)) {
-                "mob" -> MobSpawner.Serializer.read(reader)
-                "npc" -> NPCSpawner.Serializer.read(reader)
+        override fun read(context: DeserializationContext): EntitySpawner {
+            return when(val type = context.read(spawnerType)) {
+                "mob" -> MobSpawner.Serializer.read(context)
+                "npc" -> NPCSpawner.Serializer.read(context)
                 else -> throw NBTReadError("", "Invalid entity spawner type: $type")
             }
         }
 
-        override fun write(writer: TagWritable, value: EntitySpawner) {
-            writer.setTag(typeTag, when(value) {
+        override fun write(context: SerializationContext, value: EntitySpawner) {
+            context.write(spawnerType, when(value) {
                 is MobSpawner -> {
-                    MobSpawner.Serializer.write(writer, value)
+                    MobSpawner.Serializer.write(context, value)
                     "mob"
                 }
                 is NPCSpawner -> {
-                    NPCSpawner.Serializer.write(writer, value)
+                    NPCSpawner.Serializer.write(context, value)
                     "npc"
                 }
             })

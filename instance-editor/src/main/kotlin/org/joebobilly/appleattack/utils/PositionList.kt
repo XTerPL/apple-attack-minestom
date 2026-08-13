@@ -15,22 +15,25 @@ import org.bukkit.World
 import org.bukkit.entity.Display
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataAdapterContext
-import org.bukkit.persistence.PersistentDataContainer
-import org.bukkit.persistence.PersistentDataType
-import org.joebobilly.appleattack.InstanceEditor
 import org.joebobilly.appleattack.holograms.HologramManager
+import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
+import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
+import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import org.joebobilly.appleattack.serialization.SerializationTypes
 import org.joml.Vector3f
 
 class PositionList {
     companion object {
-        val POSITION_LIST_KEY = InstanceEditor.key("position_list")
-        val POSITION_LIST_ENTRY = PersistentDataEntry(POSITION_LIST_KEY, PersistentType)
+        val POSITION_LIST_KEY = KeyUtils.of("position_list")
+        val POSITION_LIST_ENTRY = Serializer.toEntry(POSITION_LIST_KEY)
 
         fun createPositionListItem(): ItemStack {
             val itemStack = ItemStack.of(Material.GLOBE_BANNER_PATTERN)
             itemStack.editPersistentDataContainer {
-                POSITION_LIST_ENTRY.set(it, PositionList())
+                POSITION_LIST_ENTRY.persistentDataEntry.set(it, PositionList())
             }
             updatePositionListItem(itemStack)
             return itemStack
@@ -38,7 +41,7 @@ class PositionList {
 
         @Suppress("UnstableApiUsage")
         fun updatePositionListItem(itemStack: ItemStack) {
-            val positionList = POSITION_LIST_ENTRY.get(itemStack.persistentDataContainer)
+            val positionList = POSITION_LIST_ENTRY.persistentDataEntry.get(itemStack.persistentDataContainer)
             if(positionList != null) {
                 itemStack.setData(
                     DataComponentTypes.ITEM_NAME, Component.text("Position List")
@@ -71,7 +74,7 @@ class PositionList {
             world = location.world.key
         }
         if(location.world.key == world) {
-            positions.add(Position(location))
+            positions.add(Position.fromPaperLocation(location))
             return true
         }
         return false
@@ -95,7 +98,7 @@ class PositionList {
         val world = getWorld() ?: return
         for(i in 0..<positions.size) {
             val pos = positions[i]
-            val location = pos.toLocation(world).setRotation(0f, 0f)
+            val location = pos.toPaperLocation(world).setRotation(0f, 0f)
             display.addHologram(location) {
                 val line = it.addItemLine()
                 line.isGlowing = true
@@ -119,67 +122,28 @@ class PositionList {
         }
     }
 
-    data class Position(val x: Double, val y: Double, val z: Double, val yaw: Float, val pitch: Float) {
-        constructor(location: Location) : this(location.x, location.y, location.z, location.yaw, location.pitch)
+    object Serializer : NBTCopySerializer<PositionList>(PositionList::class) {
+        private val world = SerializationTypes.KEY.toEntry("world")
+        private val positions = Position.Serializer.list().toEntry("positions")
 
-        fun toLocation(world: World): Location {
-            return Location(world, this.x, this.y, this.z, this.yaw, this.pitch)
-        }
-
-        object PersistentType : PersistentDataType<PersistentDataContainer, Position> {
-            private val xEntry = PersistentDataEntry("x", PersistentDataType.DOUBLE)
-            private val yEntry = PersistentDataEntry("y", PersistentDataType.DOUBLE)
-            private val zEntry = PersistentDataEntry("z", PersistentDataType.DOUBLE)
-            private val yawEntry = PersistentDataEntry("yaw", PersistentDataType.FLOAT)
-            private val pitchEntry = PersistentDataEntry("pitch", PersistentDataType.FLOAT)
-
-            override fun getPrimitiveType(): Class<PersistentDataContainer> = PersistentDataContainer::class.java
-            override fun getComplexType() = Position::class.java
-
-            override fun toPrimitive(value: Position, ctx: PersistentDataAdapterContext): PersistentDataContainer {
-                val container = ctx.newPersistentDataContainer()
-                xEntry.set(container, value.x)
-                yEntry.set(container, value.y)
-                zEntry.set(container, value.z)
-                pitchEntry.set(container, value.yaw)
-                yawEntry.set(container, value.pitch)
-                return container
-            }
-
-            override fun fromPrimitive(value: PersistentDataContainer, ctx: PersistentDataAdapterContext): Position {
-                val x = xEntry.getOrDefault(value, 0.0)
-                val y = yEntry.getOrDefault(value, 0.0)
-                val z = zEntry.getOrDefault(value, 0.0)
-                val yaw = yawEntry.getOrDefault(value, 0f)
-                val pitch = pitchEntry.getOrDefault(value, 0f)
-                return Position(x, y, z, yaw, pitch)
-            }
-        }
-    }
-
-    object PersistentType : PersistentDataType<PersistentDataContainer, PositionList> {
-        private val worldEntry = PersistentDataEntry("world", KeyPersistentType)
-        private val positionsEntry = PersistentDataEntry("positions",
-            PersistentDataType.LIST.listTypeFrom(Position.PersistentType))
-
-        override fun getPrimitiveType() = PersistentDataContainer::class.java
-        override fun getComplexType() = PositionList::class.java
-
-        override fun toPrimitive(value: PositionList, ctx: PersistentDataAdapterContext): PersistentDataContainer {
-            val container = ctx.newPersistentDataContainer()
-            if(value.world == null) {
-                return container
-            }
-            worldEntry.set(container, value.world!!)
-            positionsEntry.set(container, value.positions)
-            return container
-        }
-
-        override fun fromPrimitive(value: PersistentDataContainer, ctx: PersistentDataAdapterContext): PositionList {
+        override fun read(context: DeserializationContext): PositionList {
             val result = PositionList()
-            if(value.isEmpty) return result
-            result.world = worldEntry.get(value) ?: throw IllegalArgumentException("world not found")
-            result.positions.addAll(positionsEntry.get(value) ?: throw IllegalArgumentException("positions not found"))
+            if(context.isEmpty()) return result
+            result.world = context.read(world)
+            result.positions.addAll(context.read(positions))
+            return result
+        }
+
+        override fun write(context: SerializationContext, value: PositionList) {
+            context.write(world, value.world ?: return)
+            context.write(positions, value.positions)
+        }
+
+        override fun copy(value: PositionList): PositionList {
+            val result = PositionList()
+            if(value.world == null) return result
+            result.world = value.world
+            result.positions.addAll(value.positions)
             return result
         }
     }

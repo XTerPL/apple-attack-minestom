@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly(libs.paper)
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(project(":common"))
     compileOnly("net.thenextlvl:holograms:1.5.4")
