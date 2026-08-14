@@ -38,8 +38,10 @@ open class ToolMeta {
         return meta
     }
 
-    object Serializer : NBTCopySerializer<ToolMeta>(ToolMeta::class) {
+    object Serializer : NBTCopySerializer<ToolMeta> {
         private val upgradeItems = AAItemMetaPair.Serializer.list().toEntry("upgrades")
+
+        override val klass = ToolMeta::class
 
         override fun read(context: DeserializationContext): ToolMeta {
             val upgradeItems = context.read(upgradeItems) { emptyList() }

@@ -12,6 +12,7 @@ import org.joebobilly.appleattack.serialization.SerializationContext
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
 import org.joebobilly.appleattack.serialization.SerializationTypes
 import org.joebobilly.appleattack.utils.Position
+import org.joebobilly.appleattack.utils.PositionUtils.toMinestomPos
 
 sealed class EntitySpawner(val maxSpawned: Int = 1) {
     private var instance: Instance? = null
@@ -50,8 +51,10 @@ sealed class EntitySpawner(val maxSpawned: Int = 1) {
         this.instance = instance
     }
 
-    object Serializer : NBTSerializer<EntitySpawner>(EntitySpawner::class) {
+    object Serializer : NBTSerializer<EntitySpawner> {
         val spawnerType = SerializationTypes.STRING.toEntry("spawner_type")
+
+        override val klass = EntitySpawner::class
 
         override fun read(context: DeserializationContext): EntitySpawner {
             return when(val type = context.read(spawnerType)) {

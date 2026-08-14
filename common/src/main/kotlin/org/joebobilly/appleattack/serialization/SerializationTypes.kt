@@ -2,45 +2,23 @@ package org.joebobilly.appleattack.serialization
 
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
-import net.minestom.server.tag.Tag
-import org.bukkit.persistence.PersistentDataType
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.map
 import org.joebobilly.appleattack.utils.Position
+import kotlin.text.uppercase
 
 object SerializationTypes {
     // integers
-    val BYTE = object : SerializationType<Byte> {
-        override fun toMinestomTag(key: Key) = Tag.Byte(key.toString())
-        override fun toPersistentType() = PersistentDataType.BYTE
-    }
-    val SHORT = object : SerializationType<Short> {
-        override fun toMinestomTag(key: Key) = Tag.Short(key.toString())
-        override fun toPersistentType() = PersistentDataType.SHORT
-    }
-    val INTEGER = object : SerializationType<Int> {
-        override fun toMinestomTag(key: Key) = Tag.Integer(key.toString())
-        override fun toPersistentType() = PersistentDataType.INTEGER
-    }
-    val LONG = object : SerializationType<Long> {
-        override fun toMinestomTag(key: Key) = Tag.Long(key.toString())
-        override fun toPersistentType() = PersistentDataType.LONG
-    }
+    val BYTE = PrimitiveSerializationType.ByteType
+    val SHORT = PrimitiveSerializationType.ShortType
+    val INTEGER = PrimitiveSerializationType.IntegerType
+    val LONG = PrimitiveSerializationType.LongType
 
     // decimals
-    val FLOAT = object : SerializationType<Float> {
-        override fun toMinestomTag(key: Key) = Tag.Float(key.toString())
-        override fun toPersistentType() = PersistentDataType.FLOAT
-    }
-    val DOUBLE = object : SerializationType<Double> {
-        override fun toMinestomTag(key: Key) = Tag.Double(key.toString())
-        override fun toPersistentType() = PersistentDataType.DOUBLE
-    }
+    val FLOAT = PrimitiveSerializationType.FloatType
+    val DOUBLE = PrimitiveSerializationType.DoubleType
 
     // strings
-    val STRING = object : SerializationType<String> {
-        override fun toMinestomTag(key: Key) = Tag.String(key.toString())
-        override fun toPersistentType() = PersistentDataType.STRING
-    }
+    val STRING = PrimitiveSerializationType.StringType
     val KEY = STRING.map({
         try {
             return@map Key.key(it)
@@ -51,10 +29,7 @@ object SerializationTypes {
     }, Key::asString)
 
     // other
-    val BOOLEAN = object : SerializationType<Boolean> {
-        override fun toMinestomTag(key: Key) = Tag.Boolean(key.toString())
-        override fun toPersistentType() = PersistentDataType.BOOLEAN
-    }
+    val BOOLEAN = PrimitiveSerializationType.BooleanType
     val UNIT = UnitNBTSerializer
     val POSITION = Position.Serializer
 

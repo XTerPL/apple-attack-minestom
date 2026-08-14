@@ -41,8 +41,10 @@ class ForgedToolMeta<RECIPE : ForgedToolMeta.Recipe>(val recipe: RECIPE) : ToolM
 
     @Suppress("UNCHECKED_CAST")
     class Serializer<RECIPE : Recipe>(private val recipeSerializer: NBTCopySerializer<RECIPE>)
-        : NBTCopySerializer<ForgedToolMeta<RECIPE>>( ForgedToolMeta::class as KClass<ForgedToolMeta<RECIPE>>) {
+        : NBTCopySerializer<ForgedToolMeta<RECIPE>> {
         private val recipe = recipeSerializer.toEntry("recipe")
+
+        override val klass = ForgedToolMeta::class as KClass<ForgedToolMeta<RECIPE>>
 
         override fun read(context: DeserializationContext): ForgedToolMeta<RECIPE> {
             val recipe = context.read(recipe)

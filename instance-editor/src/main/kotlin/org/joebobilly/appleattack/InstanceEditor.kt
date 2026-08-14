@@ -11,6 +11,10 @@ class InstanceEditor : JavaPlugin() {
         val logger get() = get().logger
     }
 
+    override fun onLoad() {
+        Platform.setPlatform(PaperPlatform)
+    }
+
     override fun onEnable() {
         server.pluginManager.registerEvents(PositionListListener, this)
         server.pluginManager.registerEvents(HologramManager, this)

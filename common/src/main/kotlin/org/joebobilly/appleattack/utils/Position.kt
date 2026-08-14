@@ -1,8 +1,5 @@
 package org.joebobilly.appleattack.utils
 
-import net.minestom.server.coordinate.Pos
-import org.bukkit.Location
-import org.bukkit.World
 import org.joebobilly.appleattack.serialization.DeserializationContext
 import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
 import org.joebobilly.appleattack.serialization.NBTCopySerializer
@@ -11,28 +8,19 @@ import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEn
 import org.joebobilly.appleattack.serialization.SerializationTypes
 
 data class Position(val x: Double, val y: Double, val z: Double, val yaw: Float, val pitch: Float) {
-    companion object {
-        fun fromPaperLocation(location: Location)
-            = Position(location.x, location.y, location.z, location.yaw, location.pitch)
-        fun fromMinestomPos(pos: Pos)
-            = Position(pos.x, pos.y, pos.z, pos.yaw, pos.pitch)
-    }
+    // this has to exist for some reason???
+    companion object;
 
     constructor(x: Double, y: Double, z: Double) : this(x, y, z, 0f, 0f)
 
-    fun toPaperLocation(world: World): Location {
-        return Location(world, this.x, this.y, this.z, this.yaw, this.pitch)
-    }
-    fun toMinestomPos(): Pos {
-        return Pos(this.x, this.y, this.z, this.yaw, this.pitch)
-    }
-
-    object Serializer : NBTCopySerializer<Position>(Position::class) {
+    object Serializer : NBTCopySerializer<Position> {
         private val x = SerializationTypes.DOUBLE.toEntry("x")
         private val y = SerializationTypes.DOUBLE.toEntry("y")
         private val z = SerializationTypes.DOUBLE.toEntry("z")
         private val yaw = SerializationTypes.FLOAT.toEntry("yaw")
         private val pitch = SerializationTypes.FLOAT.toEntry("pitch")
+
+        override val klass = Position::class
 
         override fun read(context: DeserializationContext): Position {
             val x = context.read(x, 0.0)

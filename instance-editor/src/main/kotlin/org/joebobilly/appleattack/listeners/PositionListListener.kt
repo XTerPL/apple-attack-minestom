@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.PlayerInventory
 import org.joebobilly.appleattack.holograms.HologramManager
+import org.joebobilly.appleattack.serialization.PaperSerializationEntry.Companion.persistentDataEntry
 import org.joebobilly.appleattack.utils.PositionList
 import org.joebobilly.appleattack.utils.Sounds
 

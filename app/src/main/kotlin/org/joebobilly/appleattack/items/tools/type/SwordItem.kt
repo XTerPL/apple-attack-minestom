@@ -51,10 +51,12 @@ sealed class SwordItem<METATYPE : ToolMeta>(id: String, metaSerializer: NBTCopyS
             return bladeDown
         }
 
-        object Serializer : NBTCopySerializer<Recipe>(Recipe::class) {
+        object Serializer : NBTCopySerializer<Recipe> {
             val handle = AAItemMetaPair.Serializer.toEntry("handle")
             val bladeDown = AAItemMetaPair.Serializer.toEntry("blade_down")
             val bladeUp = AAItemMetaPair.Serializer.toEntry("blade_up")
+
+            override val klass = Recipe::class
 
             override fun read(context: DeserializationContext): Recipe {
                 return Recipe(

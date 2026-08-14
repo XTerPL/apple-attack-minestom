@@ -24,7 +24,7 @@ class NPCSpawner(val npcType: NPCType, val position: Position)
         return npcType.spawn(instance, spawnLocation)
     }
 
-    object Serializer : NBTSerializer<NPCSpawner>(NPCSpawner::class) {
+    object Serializer : NBTSerializer<NPCSpawner> {
         val npcType = SerializationTypes.STRING.map(
             {
                 val type = AAEntityTypeManager.getOrThrow(it)
@@ -32,6 +32,8 @@ class NPCSpawner(val npcType: NPCType, val position: Position)
             }, NPCType::id
         ).toEntry("id")
         val position = SerializationTypes.POSITION.toEntry("position")
+
+        override val klass = NPCSpawner::class
 
         override fun read(context: DeserializationContext): NPCSpawner {
             val type = context.read(npcType)

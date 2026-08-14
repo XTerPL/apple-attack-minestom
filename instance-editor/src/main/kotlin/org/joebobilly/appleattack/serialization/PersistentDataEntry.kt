@@ -5,7 +5,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 import org.joebobilly.appleattack.utils.KeyUtils
-import org.joebobilly.appleattack.utils.KeyUtils.toNamespacedKey
+import org.joebobilly.appleattack.utils.NamespacedKeyUtils.toNamespacedKey
 
 data class PersistentDataEntry<P : Any, C : Any>(val key: Key, val type: PersistentDataType<P, C>) {
     constructor(key: String, type: PersistentDataType<P, C>) : this(KeyUtils.of(key), type)

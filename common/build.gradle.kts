@@ -14,17 +14,10 @@ repositories {
 
 dependencies {
     compileOnly(libs.adventure)
-    compileOnly(libs.minestom)
-    compileOnly(libs.paper)
     implementation(libs.guava)
-    testImplementation(kotlin("test"))
 }
 
 val targetJavaVersion = 25
 kotlin {
     jvmToolchain(targetJavaVersion)
-}
-
-tasks.test {
-    useJUnitPlatform()
 }

@@ -39,7 +39,9 @@ class AAItemMetaPair<METATYPE : Any>(val itemType: AAItem<METATYPE>, meta: METAT
         return null
     }
 
-    object Serializer : NBTCopySerializer<AAItemMetaPair<*>>(AAItemMetaPair::class) {
+    object Serializer : NBTCopySerializer<AAItemMetaPair<*>> {
+        override val klass = AAItemMetaPair::class
+
         override fun read(context: DeserializationContext): AAItemMetaPair<*> {
             val itemType = context.read(AAItem.itemEntry)
             return readPair(context, itemType)

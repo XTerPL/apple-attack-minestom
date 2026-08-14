@@ -5,6 +5,7 @@ minestom = "2026.05.17-1.21.11"
 slf4j = "2.0.13"
 adventure = "5.1.0"
 paper = "1.21.11-R0.1-SNAPSHOT"
+kotlin = "2.4.10"
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -15,4 +16,4 @@ adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 paper = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.20" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -5,9 +5,9 @@ import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.minestom.server.entity.Player
 import net.minestom.server.tag.TagHandler
 import org.joebobilly.appleattack.items.ItemStackSerializer
-import org.joebobilly.appleattack.serialization.DeserializationContext
 import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
-import org.joebobilly.appleattack.serialization.SerializationContext
+import org.joebobilly.appleattack.serialization.MinestomDeserializationContext
+import org.joebobilly.appleattack.serialization.MinestomSerializationContext
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
 import java.nio.file.Files
@@ -60,7 +60,7 @@ object PlayerSaveManager {
 
     private fun serializePlayer(player: Player): CompoundBinaryTag {
         val handler = TagHandler.newHandler()
-        val context = SerializationContext.Minestom(handler)
+        val context = MinestomSerializationContext(handler)
 
         context.write(inventoryTag, listOf(*player.inventory.itemStacks))
 
@@ -68,7 +68,7 @@ object PlayerSaveManager {
     }
 
     private fun deserializePlayer(player: Player, data: CompoundBinaryTag) {
-        val context = DeserializationContext.Minestom(data)
+        val context = MinestomDeserializationContext(data)
 
         val inventory = context.read(inventoryTag) { emptyList() }
         for(i in 0..<inventory.size) {

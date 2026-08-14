@@ -32,7 +32,7 @@ class MobSpawner(val mobType: AAMobType, maxSpawned: Int, val positions: List<Po
         return mobType.spawn(instance, spawnLocation)
     }
 
-    object Serializer : NBTSerializer<MobSpawner>(MobSpawner::class) {
+    object Serializer : NBTSerializer<MobSpawner> {
         val mobType = SerializationTypes.STRING.map(
             {
                 val type = AAEntityTypeManager.getOrThrow(it)
@@ -41,6 +41,8 @@ class MobSpawner(val mobType: AAMobType, maxSpawned: Int, val positions: List<Po
         ).toEntry("id")
         val maxSpawned = SerializationTypes.INTEGER.toEntry("max_spawned")
         val positions = SerializationTypes.POSITION.list().toEntry("positions")
+
+        override val klass = MobSpawner::class
 
         override fun read(context: DeserializationContext): MobSpawner {
             val type = context.read(mobType)

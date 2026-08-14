@@ -10,9 +10,11 @@ import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEn
 import org.joebobilly.appleattack.serialization.SerializationTypes
 import java.util.logging.Logger
 
-object ItemStackSerializer : NBTCopySerializer<ItemStack>(ItemStack::class) {
+object ItemStackSerializer : NBTCopySerializer<ItemStack> {
     private val count = SerializationTypes.INTEGER.toEntry("count")
     private val invalidItemStackLogger = Logger.getLogger("invalid-item-stack")
+
+    override val klass = ItemStack::class
 
     override fun read(context: DeserializationContext): ItemStack {
         val itemType = context.readNullable(AAItem.itemEntry) ?: return ItemStack.AIR

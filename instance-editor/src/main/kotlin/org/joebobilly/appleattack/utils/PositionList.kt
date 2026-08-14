@@ -16,9 +16,12 @@ import org.bukkit.entity.Display
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.joebobilly.appleattack.holograms.HologramManager
+import org.joebobilly.appleattack.utils.PositionUtils.fromPaperLocation
+import org.joebobilly.appleattack.utils.PositionUtils.toPaperLocation
 import org.joebobilly.appleattack.serialization.DeserializationContext
 import org.joebobilly.appleattack.serialization.DeserializationContext.Companion.read
 import org.joebobilly.appleattack.serialization.NBTCopySerializer
+import org.joebobilly.appleattack.serialization.PaperSerializationEntry.Companion.persistentDataEntry
 import org.joebobilly.appleattack.serialization.SerializationContext
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
@@ -122,9 +125,11 @@ class PositionList {
         }
     }
 
-    object Serializer : NBTCopySerializer<PositionList>(PositionList::class) {
+    object Serializer : NBTCopySerializer<PositionList> {
         private val world = SerializationTypes.KEY.toEntry("world")
         private val positions = Position.Serializer.list().toEntry("positions")
+
+        override val klass = PositionList::class
 
         override fun read(context: DeserializationContext): PositionList {
             val result = PositionList()

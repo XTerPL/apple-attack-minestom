@@ -6,6 +6,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.joebobilly.appleattack.serialization.PaperSerializationEntry.Companion.persistentDataEntry
 import org.joebobilly.appleattack.utils.PositionList
 import org.joebobilly.appleattack.utils.Sounds
 import org.joebobilly.appleattack.utils.SubCommandResult
@@ -57,6 +58,7 @@ class PositionListCommand : CommandExecutor {
         }
 
         sender.playSound(Sounds.POSITION_REMOVE)
+
         return SubCommandResult.SUCCESS
     }
 }

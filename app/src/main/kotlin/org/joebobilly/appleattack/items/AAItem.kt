@@ -5,7 +5,8 @@ import net.kyori.adventure.text.Component
 import net.minestom.server.component.DataComponents
 import net.minestom.server.item.ItemStack
 import net.minestom.server.item.Material
-import org.joebobilly.appleattack.serialization.DeserializationContext
+import org.joebobilly.appleattack.serialization.MinestomDeserializationContext
+import org.joebobilly.appleattack.serialization.MinestomSerializationEntry.Companion.minestomTag
 import org.joebobilly.appleattack.serialization.NBTCopySerializer
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.map
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
@@ -73,7 +74,7 @@ abstract class AAItem<METATYPE : Any>(
 
     // serialization
     fun deserializeMeta(nbt: CompoundBinaryTag): METATYPE {
-        return metaSerializer.read(DeserializationContext.Minestom(nbt))
+        return metaSerializer.read(MinestomDeserializationContext(nbt))
     }
     internal fun copyMeta(meta: METATYPE): METATYPE {
         return metaSerializer.copy(meta)

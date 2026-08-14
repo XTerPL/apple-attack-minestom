@@ -5,6 +5,7 @@ import net.minestom.server.event.instance.InstanceRegisterEvent
 import net.minestom.server.event.instance.InstanceUnregisterEvent
 import org.joebobilly.appleattack.entities.spawners.EntitySpawner
 import org.joebobilly.appleattack.entities.spawners.SpawnerManager
+import org.joebobilly.appleattack.serialization.MinestomSerializationEntry.Companion.minestomTag
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
 import org.joebobilly.appleattack.utils.TagUtils.getTagSourced

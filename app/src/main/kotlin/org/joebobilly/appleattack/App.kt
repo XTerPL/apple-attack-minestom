@@ -50,6 +50,8 @@ fun main() {
         return
     }
 
+    Platform.setPlatform(MinestomPlatform)
+
     Items.register()
     AAItemManager.freeze()
 
