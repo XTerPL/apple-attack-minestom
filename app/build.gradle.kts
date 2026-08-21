@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":common"))
     implementation(libs.guava)
     implementation(libs.minestom)
+    implementation(libs.adventure.minimessage)
     implementation(libs.slf4j.simple)
 }
 

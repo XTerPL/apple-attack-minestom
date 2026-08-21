@@ -1,11 +1,12 @@
 package org.joebobilly.appleattack.entities.type
 
 import net.minestom.server.entity.EntityType
+import org.joebobilly.appleattack.entities.EntityTypeClass
 import org.joebobilly.appleattack.entities.npcs.NPC
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.players.cutscenes.Cutscene
 
-abstract class NPCType(id: String, startingEntityType: EntityType) : AAEntityType<NPC>(id, startingEntityType) {
+abstract class NPCType(id: String, startingEntityType: EntityType) : AAEntityType<NPC>(id, startingEntityType, EntityTypeClass.NPC) {
     final override fun createUninitialized(): NPC {
         return NPC(this)
     }

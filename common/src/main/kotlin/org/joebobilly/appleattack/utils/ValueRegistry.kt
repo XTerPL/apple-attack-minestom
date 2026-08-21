@@ -1,5 +1,6 @@
 package org.joebobilly.appleattack.utils
 
+import org.joebobilly.appleattack.utils.CommandUtils.filterByCommandInput
 import java.util.Collections
 
 abstract class ValueRegistry<T>(val idProvider: (T) -> String, val name: String) {
@@ -34,7 +35,10 @@ abstract class ValueRegistry<T>(val idProvider: (T) -> String, val name: String)
     fun getOrThrow(id: String): T {
         return get(id) ?: throw NoSuchElementException("Unknown $name '$id'!")
     }
+    fun list(): List<T> {
+        return values.values.toList()
+    }
     fun <T> getSuggestions(input: String, suggestionEntryFactory: (String) -> T): List<T> {
-        return values.keys.toList().filter { key -> key.lowercase().startsWith(input.lowercase()) }.map(suggestionEntryFactory)
+        return values.keys.toList().filterByCommandInput(input, String::lowercase).map(suggestionEntryFactory)
     }
 }

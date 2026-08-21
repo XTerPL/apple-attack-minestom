@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/instance-editor/apple-attack-mc.instance-editor.main.iml" filepath="$PROJECT_DIR$/.idea/modules/instance-editor/apple-attack-mc.instance-editor.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/instance-editor/apple-attack-mc.instance-editor.test.iml" filepath="$PROJECT_DIR$/.idea/modules/instance-editor/apple-attack-mc.instance-editor.test.iml" />
     </modules>
   </component>
 </project>

@@ -5,9 +5,6 @@ import io.papermc.paper.datacomponent.item.ItemLore
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.thenextlvl.hologram.action.ActionTypes
-import net.thenextlvl.hologram.action.ClickAction
-import net.thenextlvl.hologram.action.ClickType
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -15,6 +12,8 @@ import org.bukkit.World
 import org.bukkit.entity.Display
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.joebobilly.appleattack.holograms.HologramActionTypes
+import org.joebobilly.appleattack.holograms.HologramActionTypes.left
 import org.joebobilly.appleattack.holograms.HologramManager
 import org.joebobilly.appleattack.utils.PositionUtils.fromPaperLocation
 import org.joebobilly.appleattack.utils.PositionUtils.toPaperLocation
@@ -92,6 +91,10 @@ class PositionList {
         return false
     }
 
+    fun getPositions(): List<Position> {
+        return positions.toList()
+    }
+
     fun getWorld(): World? {
         return Bukkit.getWorld(world ?: return null)
     }
@@ -108,13 +111,7 @@ class PositionList {
                 line.itemStack = ItemStack.of(Material.TARGET)
                 line.billboard = Display.Billboard.FIXED
                 line.transformation = TransformationUtils.scale(Vector3f(0.5f))
-                @Suppress("UnstableApiUsage") // why is ActionTypes internal???
-                val removeAction = ClickAction.factory().create(
-                    ActionTypes.types().runCommand(),
-                    EnumUtils.setOf(ClickType.LEFT),
-                    "positionlist remove $i"
-                )
-                line.addAction("remove", removeAction)
+                line.addAction("remove", HologramActionTypes.runCommand().left("positionlist remove $i"))
             }
         }
     }

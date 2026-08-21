@@ -13,7 +13,7 @@ import org.joebobilly.appleattack.items.AAItemManager
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.items.tools.ToolMeta
 import org.joebobilly.appleattack.items.tools.type.ToolItem
-import org.joebobilly.appleattack.utils.CommandUtils
+import org.joebobilly.appleattack.utils.MinestomCommandUtils
 
 object AddUpgradeCommand : Command("addupgrade") {
     init {
@@ -40,7 +40,7 @@ object AddUpgradeCommand : Command("addupgrade") {
                     return@addSyntax
                 }
                 val metaNbt = ctx.get(metaNbtArgument)
-                val metaPair = CommandUtils.parseItemMetaPair(sender, itemType, metaNbt) ?: return@addSyntax
+                val metaPair = MinestomCommandUtils.parseItemMetaPair(sender, itemType, metaNbt) ?: return@addSyntax
                 val toolType = AAItemManager.getItem(sender.itemInMainHand)
                 if(toolType is ToolItem<*>) {
                     upgradeTool(sender, toolType, metaPair)

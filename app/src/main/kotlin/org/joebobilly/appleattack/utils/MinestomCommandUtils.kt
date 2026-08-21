@@ -10,7 +10,7 @@ import org.joebobilly.appleattack.items.AAItem
 import org.joebobilly.appleattack.items.AAItemMetaPair
 import org.joebobilly.appleattack.serialization.NBTReadError
 
-object CommandUtils {
+object MinestomCommandUtils {
     fun <METATYPE : Any> parseItemMetaPair(sender: CommandSender?, itemType: AAItem<METATYPE>, metaNbt: CompoundBinaryTag) : AAItemMetaPair<METATYPE>? {
         try {
             val meta = itemType.deserializeMeta(keyifyCompound(metaNbt))

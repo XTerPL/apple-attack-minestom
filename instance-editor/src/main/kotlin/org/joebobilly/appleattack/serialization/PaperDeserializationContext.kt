@@ -1,9 +1,9 @@
 package org.joebobilly.appleattack.serialization
 
-import org.bukkit.persistence.PersistentDataContainer
+import io.papermc.paper.persistence.PersistentDataContainerView
 import org.joebobilly.appleattack.serialization.PaperSerializationEntry.Companion.persistentDataEntry
 
-class PaperDeserializationContext(private val container: PersistentDataContainer) : DeserializationContext {
+class PaperDeserializationContext(private val container: PersistentDataContainerView) : DeserializationContext {
     override fun <T : Any> readNullable(entry: SerializationEntry<T>): T? {
         return NBTReadError.wrap(entry.key.toString()) {
             entry.persistentDataEntry.get(container)

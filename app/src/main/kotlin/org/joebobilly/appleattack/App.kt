@@ -22,10 +22,8 @@ import org.joebobilly.appleattack.commands.LookNBTCommand
 import org.joebobilly.appleattack.commands.SpawnCommand
 import org.joebobilly.appleattack.commands.StopCommand
 import org.joebobilly.appleattack.content.items.Items
-import org.joebobilly.appleattack.content.entities.mobs.AppleMob
 import org.joebobilly.appleattack.content.entities.mobs.Mobs
 import org.joebobilly.appleattack.content.entities.npcs.NPCs
-import org.joebobilly.appleattack.content.entities.npcs.TestNPC
 import org.joebobilly.appleattack.content.traits.Traits
 import org.joebobilly.appleattack.entities.AAEntityTypeManager
 import org.joebobilly.appleattack.events.DamageEvents
@@ -37,30 +35,13 @@ import org.joebobilly.appleattack.items.tools.traits.TraitManager
 import org.joebobilly.appleattack.events.InteractEvents
 import org.joebobilly.appleattack.players.AAPlayer
 import org.joebobilly.appleattack.players.PlayerSaveManager
-import org.joebobilly.appleattack.entities.spawners.MobSpawner
-import org.joebobilly.appleattack.entities.spawners.NPCSpawner
 import org.joebobilly.appleattack.entities.spawners.SpawnerManager
-import org.joebobilly.appleattack.utils.Position
 import java.nio.file.Path
 import java.util.logging.Logger
+import kotlin.system.exitProcess
 
 fun main() {
-    if(!ServerFlag.SERIALIZE_EMPTY_COMPOUND) {
-        println("Please set the system variable 'minestom.serialization.serialize-empty-nbt-compound' to true")
-        return
-    }
-
-    Platform.setPlatform(MinestomPlatform)
-
-    Items.register()
-    AAItemManager.freeze()
-
-    Mobs.register()
-    NPCs.register()
-    AAEntityTypeManager.freeze()
-
-    Traits.register()
-    TraitManager.freeze()
+    init()
 
     val minecraftServer = MinecraftServer.init(Auth.Online())
 
@@ -86,26 +67,25 @@ fun main() {
     InstanceEvents.init(globalEventHandler)
     InteractEvents.init(globalEventHandler)
 
-    val instanceManager = MinecraftServer.getInstanceManager()
-    val instance: InstanceContainer = instanceManager.createInstanceContainer()
     val cwd = Path.of("").toAbsolutePath()
     println("Working directory: $cwd")
 
     val worldPath = Path.of("worlds/main").toAbsolutePath()
     println("World path: $worldPath")
 
-    instance.chunkLoader = AnvilLoader(worldPath)
+    val instanceManager = MinecraftServer.getInstanceManager()
+    val instance: InstanceContainer = instanceManager.createInstanceContainer(AnvilLoader(worldPath))
 
-    SpawnerManager.registerSpawner(
-        MobSpawner(AppleMob, 5, listOf(
+    /*SpawnerManager.registerSpawner(
+        EntitySpawner.mob(AppleMob, listOf(
             Position(-20.5, 57.0, 88.5),
             Position(-15.5, 57.0, 86.5),
             Position(-24.5, 57.0, 83.5)
-        )), instance
+        ), 5), instance
     )
     SpawnerManager.registerSpawner(
-        NPCSpawner(TestNPC, Position(-16.5, 57.0, 55.5)), instance
-    )
+        EntitySpawner.npc(TestNPC, Position(-16.5, 57.0, 55.5)), instance
+    )*/
 
     val spawnPoint = Pos(-8.0, 57.0, 64.0)
 
@@ -153,4 +133,23 @@ fun main() {
     MinecraftServer.getConnectionManager().setPlayerProvider { connection, gameProfile -> AAPlayer(connection, gameProfile) }
 
     minecraftServer.start("0.0.0.0", 25565)
+}
+
+fun init() {
+    if(!ServerFlag.SERIALIZE_EMPTY_COMPOUND) {
+        println("Please set the system variable 'minestom.serialization.serialize-empty-nbt-compound' to true")
+        exitProcess(1)
+    }
+
+    Platform.setPlatform(MinestomPlatform)
+
+    Items.register()
+    AAItemManager.freeze()
+
+    Mobs.register()
+    NPCs.register()
+    AAEntityTypeManager.freeze()
+
+    Traits.register()
+    TraitManager.freeze()
 }

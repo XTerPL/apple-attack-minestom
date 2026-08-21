@@ -7,8 +7,9 @@ import net.minestom.server.entity.Entity
 import net.minestom.server.entity.EntityType
 import net.minestom.server.entity.Player
 import net.minestom.server.instance.Instance
+import org.joebobilly.appleattack.entities.EntityTypeClass
 
-sealed class AAEntityType<ENTITY : Entity>(val id: String, val startingEntityType: EntityType) {
+sealed class AAEntityType<ENTITY : Entity>(val id: String, val startingEntityType: EntityType, val entityClass: EntityTypeClass) {
     abstract fun entityName(): Component
     open fun despawnRadius(): Double? = 32.0
 

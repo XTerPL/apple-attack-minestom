@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
@@ -18,7 +19,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.paper)
+    paperweight.paperDevBundle(libs.versions.paper)
+    implementation(libs.adventure.minimessage)
+    implementation(libs.adventure.nbt)
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(project(":common"))
     compileOnly("net.thenextlvl:holograms:1.5.4")

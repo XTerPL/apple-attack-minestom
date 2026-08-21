@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.adventure)
+    compileOnly(libs.adventure.minimessage)
     implementation(libs.guava)
 }
 

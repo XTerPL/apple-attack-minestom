@@ -3,6 +3,8 @@ package org.joebobilly.appleattack.serialization
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.map
+import org.joebobilly.appleattack.utils.ComponentUtils
+import org.joebobilly.appleattack.utils.ComponentUtils.toMiniMessage
 import org.joebobilly.appleattack.utils.Position
 import kotlin.text.uppercase
 
@@ -27,6 +29,7 @@ object SerializationTypes {
             throw NBTReadError("", "invalid key '$it'", e)
         }
     }, Key::asString)
+    val COMPONENT = STRING.map(ComponentUtils::fromMiniMessage) { it.toMiniMessage() }
 
     // other
     val BOOLEAN = PrimitiveSerializationType.BooleanType

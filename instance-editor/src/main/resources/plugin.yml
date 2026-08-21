@@ -10,3 +10,9 @@ commands:
     aliases: [poslist, plist, pl]
     permission: instanceeditor.positionlist
     permission-message: "You do not have permission to use this command"
+  createentityspawner:
+    description: "Allows you to create NPC spawners"
+    usage: "/createentityspawner npc [npc type id]\n/createentityspawner mob [mob type id] [max spawned]"
+    aliases: [ createnpcspawner, createnpc, placenpc, npcadd, createmobspawner, createmob, placemob, mobadd ]
+    permission: instanceeditor.createentityspawner
+    permission-message: "You do not have permission to use this command"

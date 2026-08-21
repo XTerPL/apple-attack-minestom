@@ -11,6 +11,8 @@ data class Position(val x: Double, val y: Double, val z: Double, val yaw: Float,
     // this has to exist for some reason???
     companion object;
 
+    val zeroRotation: Position get() = Position(x, y, z)
+
     constructor(x: Double, y: Double, z: Double) : this(x, y, z, 0f, 0f)
 
     object Serializer : NBTCopySerializer<Position> {

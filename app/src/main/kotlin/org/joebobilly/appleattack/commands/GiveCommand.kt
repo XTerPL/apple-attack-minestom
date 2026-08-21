@@ -11,7 +11,7 @@ import net.minestom.server.command.builder.suggestion.SuggestionEntry
 import net.minestom.server.entity.Player
 import net.minestom.server.inventory.TransactionOption
 import org.joebobilly.appleattack.items.AAItemManager
-import org.joebobilly.appleattack.utils.CommandUtils
+import org.joebobilly.appleattack.utils.MinestomCommandUtils
 
 object GiveCommand : Command("give") {
     init {
@@ -45,7 +45,7 @@ object GiveCommand : Command("give") {
                     return@addSyntax
                 }
                 val metaNbt = ctx.get(metaNbtArgument)
-                val metaPair = CommandUtils.parseItemMetaPair(sender, itemType, metaNbt) ?: return@addSyntax
+                val metaPair = MinestomCommandUtils.parseItemMetaPair(sender, itemType, metaNbt) ?: return@addSyntax
                 val itemStack = metaPair.create(count)
                 val remainingCount = sender.inventory.addItemStack(itemStack, TransactionOption.ALL).amount()
                 val given = count - remainingCount
