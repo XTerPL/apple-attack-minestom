@@ -32,14 +32,7 @@ class PositionList {
         val POSITION_LIST_KEY = KeyUtils.of("position_list")
         val POSITION_LIST_ENTRY = Serializer.toEntry(POSITION_LIST_KEY)
 
-        fun createPositionListItem(): ItemStack {
-            val itemStack = ItemStack.of(Material.GLOBE_BANNER_PATTERN)
-            itemStack.editPersistentDataContainer {
-                POSITION_LIST_ENTRY.persistentDataEntry.set(it, PositionList())
-            }
-            updatePositionListItem(itemStack)
-            return itemStack
-        }
+        fun createPositionListItem() = PositionList().createPositionListItem()
 
         @Suppress("UnstableApiUsage")
         fun updatePositionListItem(itemStack: ItemStack) {
@@ -72,11 +65,26 @@ class PositionList {
 
     fun addPosition(location: Location): Boolean {
         if(location.world == null) return false
-        if(world == null) {
-            world = location.world.key
+        return addPosition(location.world, Position.fromPaperLocation(location))
+    }
+
+    fun addPosition(world: World, position: Position): Boolean {
+        if(this.world == null) {
+            this.world = world.key
         }
-        if(location.world.key == world) {
-            positions.add(Position.fromPaperLocation(location))
+        if(this.world == world.key) {
+            positions.add(position)
+            return true
+        }
+        return false
+    }
+
+    fun addPositions(world: World, positions: List<Position>): Boolean {
+        if(this.world == null) {
+            this.world = world.key
+        }
+        if(this.world == world.key) {
+            this.positions.addAll(positions)
             return true
         }
         return false
@@ -99,6 +107,15 @@ class PositionList {
         return Bukkit.getWorld(world ?: return null)
     }
 
+    fun createPositionListItem(): ItemStack {
+        val itemStack = ItemStack.of(Material.GLOBE_BANNER_PATTERN)
+        itemStack.editPersistentDataContainer {
+            POSITION_LIST_ENTRY.persistentDataEntry.set(it, this)
+        }
+        updatePositionListItem(itemStack)
+        return itemStack
+    }
+
     fun showToPlayer(player: Player) {
         val display = HologramManager.getHologramPlayer(player).createDisplay(POSITION_LIST_KEY)
         val world = getWorld() ?: return
@@ -111,6 +128,7 @@ class PositionList {
                 line.itemStack = ItemStack.of(Material.TARGET)
                 line.billboard = Display.Billboard.FIXED
                 line.transformation = TransformationUtils.scale(Vector3f(0.5f))
+                line.setBrightness(HologramManager.brightness())
                 line.addAction("remove", HologramActionTypes.runCommand().left("positionlist remove $i"))
             }
         }

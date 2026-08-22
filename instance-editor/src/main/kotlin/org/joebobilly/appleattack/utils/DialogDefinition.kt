@@ -11,6 +11,8 @@ import io.papermc.paper.registry.data.dialog.body.DialogBody
 import io.papermc.paper.registry.data.dialog.body.ItemDialogBody
 import io.papermc.paper.registry.data.dialog.input.DialogInput
 import io.papermc.paper.registry.data.dialog.input.NumberRangeDialogInput
+import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput
+import io.papermc.paper.registry.data.dialog.input.TextDialogInput
 import io.papermc.paper.registry.data.dialog.type.DialogType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickCallback
@@ -61,6 +63,31 @@ class DialogDefinition(title: Component) {
     }
     @DialogDefinitionMarker
     class InputsBuilder {
+        class SingleOptionBuilder(val key: String, val label: Component) {
+            private val entries = mutableListOf<SingleOptionDialogInput.OptionEntry>()
+            private var hasInitial = false
+            private var width = 200
+            private var labelVisible = true
+
+            fun add(key: String, display: Component? = null, initial: Boolean = false) {
+                check(!initial || !hasInitial) { "Cannot add two initial options" }
+                entries.add(SingleOptionDialogInput.OptionEntry.create(key, display, initial))
+                if(initial) hasInitial = true
+            }
+
+            fun width(width: Int) {
+                require(width in 1..1024) { "Width must be between 1 and 1024" }
+                this.width = width
+            }
+            fun labelVisible(labelVisible: Boolean) {
+                this.labelVisible = labelVisible
+            }
+
+            fun build(): DialogInput {
+                return DialogInput.singleOption(key, width, entries.toList(), label, labelVisible)
+            }
+        }
+
         internal val inputs = mutableListOf<DialogInput>()
         fun add(dialogInput: DialogInput) {
             inputs.add(dialogInput)
@@ -70,6 +97,12 @@ class DialogDefinition(title: Component) {
             init: NumberRangeDialogInput.Builder.() -> Unit
         ) {
             add(DialogInput.numberRange(key, label, start, end).apply(init).build())
+        }
+        fun singleOption(key: String, label: Component, init: SingleOptionBuilder.() -> Unit) {
+            add(SingleOptionBuilder(key, label).apply(init).build())
+        }
+        fun text(key: String, label: Component, init: TextDialogInput.Builder.() -> Unit) {
+            add(DialogInput.text(key, label).apply(init).build())
         }
     }
 

@@ -5,7 +5,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
-import kotlin.reflect.KClass
 
 data class PaperSerializationEntry<T : Any>(
     override val key: Key, override val type: SerializationType<T>
@@ -35,6 +34,9 @@ data class PaperSerializationEntry<T : Any>(
                         is PrimitiveSerializationType.DoubleType -> PersistentDataType.DOUBLE
                         is PrimitiveSerializationType.StringType -> PersistentDataType.STRING
                         is PrimitiveSerializationType.BooleanType -> PersistentDataType.BOOLEAN
+                        is PrimitiveSerializationType.ByteArrayType -> PersistentDataType.BYTE_ARRAY
+                        is PrimitiveSerializationType.IntArrayType -> PersistentDataType.INTEGER_ARRAY
+                        is PrimitiveSerializationType.LongArrayType -> PersistentDataType.LONG_ARRAY
                     } as PersistentDataType<*, T>
                 }
                 is NBTSerializer<T> -> object : PersistentDataType<PersistentDataContainer, T> {
@@ -59,19 +61,10 @@ data class PaperSerializationEntry<T : Any>(
         }
 
         private fun <P : Any, C : Any> convertMappedToType(type: SerializationType.Mapped<P, C>): PersistentDataType<*, C> {
-            return mapPersistentType(convertToPersistentType(type.primitiveType), type.klass, type.readMap, type.writeMap)
-        }
-
-        private fun <O : Any, P : Any, C : Any> mapPersistentType(
-            base: PersistentDataType<O, P>, klass: KClass<C>,
-            readMap: (P) -> C, writeMap: (C) -> P
-        ): PersistentDataType<O, C> = object : PersistentDataType<O, C> {
-            override fun getPrimitiveType(): Class<O> = base.primitiveType
-            override fun getComplexType(): Class<C> = klass.java
-            override fun toPrimitive(complex: C, context: PersistentDataAdapterContext)
-                    = base.toPrimitive(writeMap(complex), context)
-            override fun fromPrimitive(primitive: O, context: PersistentDataAdapterContext)
-                    = readMap(base.fromPrimitive(primitive, context))
+            return MappedPersistentDataType(
+                convertToPersistentType(type.primitiveType), type.klass,
+                type.readMap, type.writeMap
+            )
         }
     }
 }

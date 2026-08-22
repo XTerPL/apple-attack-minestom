@@ -11,9 +11,8 @@ import org.joebobilly.appleattack.entities.spawners.EntitySpawner
 import org.joebobilly.appleattack.entities.spawners.EntitySpawnerData
 import org.joebobilly.appleattack.entities.spawners.SpawnerManager
 import org.joebobilly.appleattack.serialization.MinestomSerializationEntry.Companion.minestomTag
-import org.joebobilly.appleattack.serialization.SerializationType.Companion.list
-import org.joebobilly.appleattack.serialization.SerializationType.Companion.map
 import org.joebobilly.appleattack.serialization.SerializationType.Companion.toEntry
+import org.joebobilly.appleattack.serialization.SerializationTypes
 import org.joebobilly.appleattack.utils.TagUtils.getTagSourced
 
 object InstanceEvents {
@@ -21,10 +20,7 @@ object InstanceEvents {
     val data: Tag<BinaryTag> = Tag.NBT("Data")
     val persistentData: Tag<BinaryTag> = Tag.NBT("BukkitValues")
 
-    val entitySpawners = EntitySpawnerData.Serializer.map({
-        EntitySpawner(it) },
-        EntitySpawner::entitySpawnerData
-    ).list().toEntry("entity_spawners")
+    val entitySpawners = SerializationTypes.mapUUID(EntitySpawnerData.Serializer).toEntry("entity_spawners")
 
     fun init(eventHandler: GlobalEventHandler) {
         eventHandler.addListener(InstanceRegisterEvent::class.java) {
@@ -32,7 +28,9 @@ object InstanceEvents {
             val handler = TagHandler.fromCompound(persistentData.read(data) as? CompoundBinaryTag ?: return@addListener)
 
             val entitySpawners = handler.getTagSourced(entitySpawners.minestomTag)
-            entitySpawners?.forEach { spawner -> SpawnerManager.registerSpawner(spawner, it.instance) }
+            entitySpawners?.values?.forEach {
+                spawner -> SpawnerManager.registerSpawner(EntitySpawner(spawner), it.instance)
+            }
         }
         eventHandler.addListener(InstanceUnregisterEvent::class.java) {
             SpawnerManager.unregisterAllInInstance(it.instance)

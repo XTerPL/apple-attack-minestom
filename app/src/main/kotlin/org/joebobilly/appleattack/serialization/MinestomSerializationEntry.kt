@@ -2,7 +2,10 @@ package org.joebobilly.appleattack.serialization
 
 import com.google.common.base.Suppliers
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.nbt.ByteArrayBinaryTag
 import net.kyori.adventure.nbt.CompoundBinaryTag
+import net.kyori.adventure.nbt.IntArrayBinaryTag
+import net.kyori.adventure.nbt.LongArrayBinaryTag
 import net.minestom.server.tag.Tag
 import net.minestom.server.tag.TagHandler
 
@@ -31,6 +34,27 @@ data class MinestomSerializationEntry<T : Any>(override val key: Key, override v
                         is PrimitiveSerializationType.DoubleType -> Tag.Double(key.toString())
                         is PrimitiveSerializationType.StringType -> Tag.String(key.toString())
                         is PrimitiveSerializationType.BooleanType -> Tag.Boolean(key.toString())
+                        is PrimitiveSerializationType.ByteArrayType -> Tag.NBT(key.toString()).map(
+                            {
+                                (it as? ByteArrayBinaryTag)?.value()
+                            }, {
+                                it?.let { ByteArrayBinaryTag.byteArrayBinaryTag(*it) }
+                            }
+                        )
+                        is PrimitiveSerializationType.IntArrayType -> Tag.NBT(key.toString()).map(
+                            {
+                                (it as? IntArrayBinaryTag)?.value()
+                            }, {
+                                it?.let { IntArrayBinaryTag.intArrayBinaryTag(*it) }
+                            }
+                        )
+                        is PrimitiveSerializationType.LongArrayType -> Tag.NBT(key.toString()).map(
+                            {
+                                (it as? LongArrayBinaryTag)?.value()
+                            }, {
+                                it?.let { LongArrayBinaryTag.longArrayBinaryTag(*it) }
+                            }
+                        )
                     } as Tag<T>
                 }
                 is NBTSerializer<T> -> Tag.NBT(key.toString()).map({

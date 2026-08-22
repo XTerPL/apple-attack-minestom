@@ -21,6 +21,8 @@ object HologramManager : Listener, HologramDisplayMap.KeyHologramDisplayMap() {
         this.getHologram(name).ifPresent(consumer)
     }
 
+    fun brightness(blockLight: Int = 15, skyLight: Int = 15) = org.bukkit.entity.Display.Brightness(blockLight, skyLight)
+
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val hologramPlayer = hologramPlayers.remove(event.player.uniqueId) ?: return

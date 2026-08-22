@@ -1,5 +1,6 @@
 package org.joebobilly.appleattack.serialization
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import org.joebobilly.appleattack.serialization.MinestomSerializationEntry.Companion.minestomTag
 
@@ -10,4 +11,5 @@ class MinestomDeserializationContext(private val nbt: CompoundBinaryTag) : Deser
         }
     }
     override fun isEmpty() = nbt.isEmpty
+    override fun getKeys() = nbt.keySet().map { Key.key(it) }.toSet()
 }

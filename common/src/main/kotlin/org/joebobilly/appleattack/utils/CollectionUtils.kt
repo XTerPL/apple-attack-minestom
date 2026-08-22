@@ -22,4 +22,7 @@ object CollectionUtils {
         } while(!adding)
         return result.toSet()
     }
+    fun <T, R> Pair<T, T>.map(mapper: (T) -> R): Pair<R, R> {
+        return mapper(first) to mapper(second)
+    }
 }

@@ -9,4 +9,7 @@ sealed interface PrimitiveSerializationType<T : Any> : SerializationType<T> {
     object DoubleType : PrimitiveSerializationType<Double>
     object StringType : PrimitiveSerializationType<String>
     object BooleanType : PrimitiveSerializationType<Boolean>
+    object ByteArrayType : PrimitiveSerializationType<ByteArray>
+    object IntArrayType : PrimitiveSerializationType<IntArray>
+    object LongArrayType : PrimitiveSerializationType<LongArray>
 }

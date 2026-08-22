@@ -18,7 +18,12 @@ sealed interface SerializationType<T : Any> {
 
         inline fun <P : Any, reified C : Any> SerializationType<P>.map(
             noinline readMap: (P) -> C, noinline writeMap: (C) -> P
-        ): SerializationType<C> = Mapped(this, C::class, readMap, writeMap)
+        ): SerializationType<C> {
+            require(this !is ListType<*>) {
+                "Cannot map a list type (thanks paper grrr)"
+            }
+            return Mapped(this, C::class, readMap, writeMap)
+        }
         fun <T : Any> SerializationType<T>.list(): SerializationType<List<T>> = ListType(this)
     }
 }
